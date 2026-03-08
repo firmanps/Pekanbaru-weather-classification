@@ -6,6 +6,7 @@ model = joblib.load('../ml/model/model_random_forest.pkl')
 print("✅ Model berhasil dimuat!")
 
 # Masukkan data cuaca kemarin untuk prediksi hari ini
+# Maupun data hari ini untuk prediksi hari besok
 data = {
     'TN': [24],      # Suhu minimum hari ini
     'TX': [31.9],      # Suhu maksimum hari ini
