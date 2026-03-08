@@ -98,7 +98,7 @@ export default function PredictionForm() {
         {/* BUTTONS */}
         <div className="flex flex-col sm:flex-row gap-2">
 
-        <Button className="w-full sm:flex-1 bg-blue-600">
+        <Button className="w-full sm:flex-1 bg-blue-600 hover:bg-blue-500">
           <span><Send/></span>
           Predict Weather
         </Button>
