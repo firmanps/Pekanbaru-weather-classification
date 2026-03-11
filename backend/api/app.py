@@ -1,14 +1,18 @@
+from dotenv import load_dotenv
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
 import pandas as pd
 
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
 # Load model saat server nyala
-model = joblib.load('../ml/model/model_random_forest.pkl')
+model_path = os.path.join(os.path.dirname(__file__), '../ml/model/model_random_forest.pkl')
+print(f"Loading model dari: {model_path}")
+model = joblib.load(model_path)
 print("✅ Model berhasil dimuat!")
 
 
