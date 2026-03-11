@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
@@ -86,4 +87,10 @@ def prediksi():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port_env = int(os.getenv("FLASK_PORT", 5000))
+    print(f"🚀 Server Flask berjalan di http://localhost:{port_env}")
+    app.run(
+        debug=True, 
+        host='0.0.0.0', 
+        port=port_env
+    )
