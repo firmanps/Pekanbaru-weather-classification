@@ -1,31 +1,26 @@
 "use client";
 
 import axiosInstance from "@/lib/axios";
-import axios from "axios";
+import { useWeather } from "@/lib/weather-context";
 import { useEffect, useState } from "react";
 
 export default function Forecast() {
+  const weather = useWeather();
   const [forecast, setForecast] = useState<any>(null);
 
-  const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
-
   useEffect(() => {
-    const fetchData = async () => {
+    if (!weather) return;
+
+    const fetchPrediction = async () => {
       try {
-        const weather = await axios.get(
-          `https://api.openweathermap.org/data/2.5/weather?q=Pekanbaru&units=metric&appid=${API_KEY}`,
-        );
-
-        const w = weather.data;
-
         const dataset = {
-          TN: w.main.temp_min,
-          TX: w.main.temp_max,
-          TAVG: w.main.temp,
-          RH_AVG: w.main.humidity,
-          RR: w.rain ? w.rain["1h"] : 0,
-          SS: (100 - w.clouds.all) / 10,
-          FF_AVG: w.wind.speed,
+          TN: weather.main.temp_min,
+          TX: weather.main.temp_max,
+          TAVG: weather.main.temp,
+          RH_AVG: weather.main.humidity,
+          RR: weather.rain ? weather.rain["1h"] : 0,
+          SS: (100 - weather.clouds.all) / 10,
+          FF_AVG: weather.wind.speed,
         };
 
         const prediksi = await axiosInstance.post("/prediksi", dataset);
@@ -36,16 +31,12 @@ export default function Forecast() {
           cuaca: prediksi.data.cuaca,
         });
       } catch (err) {
-        console.error(err);
+        console.error("Prediction error:", err);
       }
     };
 
-    fetchData();
-
-    const interval = setInterval(fetchData, 3600000);
-
-    return () => clearInterval(interval);
-  }, []);
+    fetchPrediction();
+  }, [weather]);
 
   function getWeatherGif(cuaca: string) {
     switch (cuaca) {
@@ -77,6 +68,14 @@ export default function Forecast() {
     });
   }
 
+  if (!weather) {
+    return (
+      <section className="max-w-5xl mx-auto py-16 px-4 text-center">
+        <p className="text-gray-500">Loading forecast...</p>
+      </section>
+    );
+  }
+
   return (
     <section className="max-w-5xl mx-auto py-16 px-4">
       <h2 className="text-center text-2xl font-semibold">
@@ -90,37 +89,37 @@ export default function Forecast() {
       <div className="flex justify-center">
         <div
           className="
-        group
-        border
-        rounded-2xl
-        p-8
-        w-full
-        max-w-md
-        flex
-        items-center
-        gap-6
-        bg-linear-to-br from-[#D2E3F2] to-[#F0E8D8]
-        shadow-sm
-        transition-all
-        duration-300
-        hover:shadow-xl
-        hover:-translate-y-1
-        "
+          group
+          border
+          rounded-2xl
+          p-8
+          w-full
+          max-w-md
+          flex
+          items-center
+          gap-6
+          bg-linear-to-br from-[#D2E3F2] to-[#F0E8D8]
+          shadow-sm
+          transition-all
+          duration-300
+          hover:shadow-xl
+          hover:-translate-y-1
+          "
         >
           {/* Icon */}
           <div
             className="
-          w-20
-          h-20
-          flex
-          items-center
-          justify-center
-          bg-white
-          rounded-full
-          transition
-          duration-300
-          group-hover:scale-110
-          "
+            w-20
+            h-20
+            flex
+            items-center
+            justify-center
+            bg-white
+            rounded-full
+            transition
+            duration-300
+            group-hover:scale-110
+            "
           >
             {forecast && (
               <img
@@ -137,7 +136,9 @@ export default function Forecast() {
 
             <p className="font-semibold text-lg">{getTomorrowDate()}</p>
 
-            <p className="text-gray-500">{forecast?.cuaca || "Loading..."}</p>
+            <p className="text-gray-500">
+              {forecast?.cuaca || "Predicting..."}
+            </p>
           </div>
         </div>
       </div>
