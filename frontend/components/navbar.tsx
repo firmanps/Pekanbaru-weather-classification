@@ -1,18 +1,14 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger
-} from "@/components/ui/sheet"
-import { Brain, CloudSun, Home, Menu } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Brain, CloudSun, Home, Menu } from "lucide-react";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <header className="w-full border-b fixed top-0 left-0 z-50 bg-white/10 backdrop-blur-3xl">
+    <header id="home" className="w-full border-b fixed top-0 left-0 z-50 bg-white/10 backdrop-blur-3xl">
       <div className="max-w-6xl mx-auto flex items-center justify-between py-4 px-4">
-
         {/* Logo */}
         <div className="flex items-center gap-2 font-semibold text-lg">
           <CloudSun className="text-blue-500" />
@@ -21,16 +17,20 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex gap-8">
-          <a href="#" className="hover:text-blue-500">Home</a>
-          <a href="#" className="hover:text-blue-500">Forecast</a>
-          <a href="#" className="hover:text-blue-500">Prediction</a>
+          <Link href="#home" className="hover:text-blue-500">
+            Home
+          </Link>
+          <Link href="#forecast" className="hover:text-blue-500">
+            Forecast
+          </Link>
+          <Link href="#prediction" className="hover:text-blue-500">
+            Prediction
+          </Link>
         </nav>
 
         {/* Mobile Menu */}
         <div className="md:hidden">
-
           <Sheet>
-
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Menu />
@@ -38,42 +38,35 @@ export default function Navbar() {
             </SheetTrigger>
 
             <SheetContent side="right" className="w-64">
-         
-            <div className="mt-8 flex flex-col gap-2 text-lg m-3">
+              <div className="mt-8 flex flex-col gap-2 text-lg m-3">
+                <Link
+                  href="#home"
+                  className="flex items-center gap-3 hover:text-blue-500 border-b py-3"
+                >
+                  <Home size={20} />
+                  Home
+                </Link>
 
-              <a
-                href="#"
-                className="flex items-center gap-3 hover:text-blue-500 border-b py-3"
-              >
-                <Home size={20} />
-                Home
-              </a>
+                <Link
+                  href="#forecast"
+                  className="flex items-center gap-3 hover:text-blue-500 border-b py-3"
+                >
+                  <CloudSun size={20} />
+                  Forecast
+                </Link>
 
-              <a
-                href="#"
-                className="flex items-center gap-3 hover:text-blue-500 border-b py-3"
-              >
-                <CloudSun size={20} />
-                Forecast
-              </a>
-
-              <a
-                href="#"
-                className="flex items-center gap-3 hover:text-blue-500 border-b py-3"
-              >
-                <Brain size={20} />
-                Prediction
-              </a>
-
+                <Link
+                  href="#prediction"
+                  className="flex items-center gap-3 hover:text-blue-500 border-b py-3"
+                >
+                  <Brain size={20} />
+                  Prediction
+                </Link>
               </div>
-
             </SheetContent>
-
           </Sheet>
-
         </div>
-
       </div>
     </header>
-  )
+  );
 }

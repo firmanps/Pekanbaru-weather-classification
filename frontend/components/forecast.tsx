@@ -77,7 +77,7 @@ export default function Forecast() {
   }
 
   return (
-    <section className="max-w-5xl mx-auto py-16 px-4">
+    <section id="forecast" className="max-w-5xl mx-auto py-16 px-4">
       <h2 className="text-center text-2xl font-semibold">
         AI Weather Forecast
       </h2>

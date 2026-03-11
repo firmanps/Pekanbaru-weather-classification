@@ -186,7 +186,7 @@ export default function PredictionForm() {
   }
 
   return (
-    <section className="max-w-4xl mx-auto py-16 px-4">
+    <section id="prediction" className="max-w-4xl mx-auto py-16 px-4">
       <h2 className="text-center text-2xl font-semibold">
         Machine Learning Weather Prediction
       </h2>
