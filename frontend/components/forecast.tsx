@@ -8,14 +8,52 @@ export default function Forecast() {
   const weather = useWeather();
   const [forecast, setForecast] = useState<any>(null);
 
+  const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
+
   useEffect(() => {
     if (!weather) return;
 
     const fetchPrediction = async () => {
       try {
+        // =========================
+        // FETCH DAILY FORECAST
+        // =========================
+
+        const forecastRes = await axiosInstance.get(
+          `https://api.openweathermap.org/data/2.5/forecast?q=Pekanbaru&units=metric&appid=${API_KEY}`,
+        );
+
+        const list = forecastRes.data.list;
+
+        // =========================
+        // FILTER DATA BESOK
+        // =========================
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const tomorrowDate = tomorrow.toISOString().split("T")[0];
+
+        const tomorrowData = list.filter((item: any) =>
+          item.dt_txt.startsWith(tomorrowDate),
+        );
+
+        // =========================
+        // HITUNG MIN MAX TEMP
+        // =========================
+
+        const temps = tomorrowData.map((item: any) => item.main.temp);
+
+        const TN = Math.min(...temps);
+        const TX = Math.max(...temps);
+
+        // =========================
+        // DATASET UNTUK ML
+        // =========================
+
         const dataset = {
-          TN: weather.main.temp_min,
-          TX: weather.main.temp_max,
+          TN,
+          TX,
           TAVG: weather.main.temp,
           RH_AVG: weather.main.humidity,
           RR: weather.rain ? weather.rain["1h"] : 0,
@@ -26,8 +64,8 @@ export default function Forecast() {
         const prediksi = await axiosInstance.post("/prediksi", dataset);
 
         setForecast({
-          min: dataset.TN,
-          max: dataset.TX,
+          min: TN,
+          max: TX,
           cuaca: prediksi.data.cuaca,
         });
       } catch (err) {
@@ -42,16 +80,12 @@ export default function Forecast() {
     switch (cuaca) {
       case "Cerah":
         return "/weather/sunny.gif";
-
       case "Berawan":
         return "/weather/cloudy.gif";
-
       case "Hujan Ringan":
         return "/weather/light-rain.gif";
-
       case "Hujan Lebat":
         return "/weather/heavy-rain.gif";
-
       default:
         return "/weather/sunny.gif";
     }
@@ -139,6 +173,12 @@ export default function Forecast() {
             <p className="text-gray-500">
               {forecast?.cuaca || "Predicting..."}
             </p>
+
+            {forecast && (
+              <p className="font-semibold">
+                {Math.round(forecast.max)}° - {Math.round(forecast.min)}°
+              </p>
+            )}
           </div>
         </div>
       </div>
