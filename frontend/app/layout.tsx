@@ -7,8 +7,9 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
 });
 
-
 export const metadata: Metadata = {
+  metadataBase: new URL("https://weather.firmanps.com"),
+
   title: "Weather Prediction System | Machine Learning Forecast",
   description:
     "Weather Prediction System is a machine learning web application that predicts weather conditions using Random Forest algorithm based on meteorological data.",
@@ -65,11 +66,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${poppins.className} antialiased`}
-      >
-        {children}
-      </body>
+      <body className={`${poppins.className} antialiased`}>{children}</body>
     </html>
   );
 }

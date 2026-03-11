@@ -45,28 +45,31 @@ export default function Hero() {
       {/* RIGHT WEATHER ICON */}
       <div className="flex justify-center">
 
-        {/* wrapper */}
+      <div className="flex justify-center">
+
         <div className="relative w-64 h-64 md:w-80 md:h-80 group">
 
           {/* main circle */}
-          <div className="w-full h-full bg-gradient-to-br from-[#D2E3F2] to-[#F0E8D8] rounded-full flex items-center justify-center transition-all duration-300 group-hover:shadow-xl">
+          <div className="w-full h-full bg-gradient-to-br from-[#D2E3F2] to-[#F0E8D8] rounded-full flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-105">
 
             <CloudSun
               size={110}
-              className="text-blue-500 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6"
+              className="text-blue-500 animate-float-weather transition-all duration-300 group-hover:-translate-y-3 group-hover:rotate-6"
             />
 
           </div>
 
           {/* temperature bubble */}
-          <div className="absolute top-3 right-0 bg-yellow-100 text-yellow-500 font-semibold px-4 py-2 rounded-full shadow text-sm md:text-base transition-transform duration-300 group-hover:-translate-y-1">
+          <div className="absolute top-3 right-0 bg-yellow-100 text-yellow-500 font-semibold px-4 py-2 rounded-full shadow text-sm md:text-base animate-float-weather transition-transform duration-300 group-hover:-translate-y-2">
             30°
           </div>
 
           {/* humidity bubble */}
-          <div className="absolute bottom-4 -left-2 bg-blue-100 text-blue-600 text-sm px-4 py-2 rounded-full shadow transition-transform duration-300 group-hover:translate-y-1">
+          <div className="absolute bottom-4 -left-2 bg-blue-100 text-blue-600 text-sm px-4 py-2 rounded-full shadow animate-float-weather transition-transform duration-300 group-hover:-translate-y-2">
             75% RH
           </div>
+
+        </div>
 
         </div>
 
