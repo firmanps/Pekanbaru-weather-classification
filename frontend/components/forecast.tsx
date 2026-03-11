@@ -1,57 +1,146 @@
-import { CloudRain, Sun } from "lucide-react"
+"use client";
+
+import axiosInstance from "@/lib/axios";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 export default function Forecast() {
-  return (
-    <section className="max-w-6xl mx-auto py-12 px-4">
+  const [forecast, setForecast] = useState<any>(null);
 
+  const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const weather = await axios.get(
+          `https://api.openweathermap.org/data/2.5/weather?q=Pekanbaru&units=metric&appid=${API_KEY}`,
+        );
+
+        const w = weather.data;
+
+        const dataset = {
+          TN: w.main.temp_min,
+          TX: w.main.temp_max,
+          TAVG: w.main.temp,
+          RH_AVG: w.main.humidity,
+          RR: w.rain ? w.rain["1h"] : 0,
+          SS: (100 - w.clouds.all) / 10,
+          FF_AVG: w.wind.speed,
+        };
+
+        const prediksi = await axiosInstance.post("/prediksi", dataset);
+
+        setForecast({
+          min: dataset.TN,
+          max: dataset.TX,
+          cuaca: prediksi.data.cuaca,
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchData();
+
+    const interval = setInterval(fetchData, 3600000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  function getWeatherGif(cuaca: string) {
+    switch (cuaca) {
+      case "Cerah":
+        return "/weather/sunny.gif";
+
+      case "Berawan":
+        return "/weather/cloudy.gif";
+
+      case "Hujan Ringan":
+        return "/weather/light-rain.gif";
+
+      case "Hujan Lebat":
+        return "/weather/heavy-rain.gif";
+
+      default:
+        return "/weather/sunny.gif";
+    }
+  }
+
+  function getTomorrowDate() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    return tomorrow.toLocaleDateString("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "short",
+    });
+  }
+
+  return (
+    <section className="max-w-5xl mx-auto py-16 px-4">
       <h2 className="text-center text-2xl font-semibold">
-        Weather Forecast
+        AI Weather Forecast
       </h2>
 
-      <p className="text-center text-gray-500 mb-8">
-        Upcoming weather conditions
+      <p className="text-center text-gray-500 mb-10">
+        AI prediction for tomorrow based on weather data
       </p>
 
-      {/* Forecast Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-        {/* Today */}
-        <div className="group border rounded-xl p-6 flex items-center gap-4 bg-gray-50 
-        transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-white">
-
-          <div className="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center
-          transition-transform duration-300 group-hover:scale-110">
-            <Sun className="text-yellow-500"/>
+      <div className="flex justify-center">
+        <div
+          className="
+        group
+        border
+        rounded-2xl
+        p-8
+        w-full
+        max-w-md
+        flex
+        items-center
+        gap-6
+        bg-linear-to-br from-[#D2E3F2] to-[#F0E8D8]
+        shadow-sm
+        transition-all
+        duration-300
+        hover:shadow-xl
+        hover:-translate-y-1
+        "
+        >
+          {/* Icon */}
+          <div
+            className="
+          w-20
+          h-20
+          flex
+          items-center
+          justify-center
+          bg-white
+          rounded-full
+          transition
+          duration-300
+          group-hover:scale-110
+          "
+          >
+            {forecast && (
+              <img
+                src={getWeatherGif(forecast.cuaca)}
+                alt="weather icon"
+                className="w-14 h-14"
+              />
+            )}
           </div>
 
-          <div>
-            <p className="text-sm text-gray-500">Today</p>
-            <p className="font-semibold text-lg">24°C – 34°C</p>
-            <p className="text-gray-500 text-sm">Sunny</p>
-          </div>
-
-        </div>
-
-
-        {/* Tomorrow */}
-        <div className="group border rounded-xl p-6 flex items-center gap-4 bg-gray-50
-        transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-white">
-
-          <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center
-          transition-transform duration-300 group-hover:scale-110">
-            <CloudRain className="text-blue-500"/>
-          </div>
-
+          {/* Text */}
           <div>
             <p className="text-sm text-gray-500">Tomorrow</p>
-            <p className="font-semibold text-lg">23°C – 31°C</p>
-            <p className="text-gray-500 text-sm">Rainy</p>
+
+            <p className="font-semibold text-lg">{getTomorrowDate()}</p>
+
+            <p className="text-gray-500">{forecast?.cuaca || "Loading..."}</p>
           </div>
-
         </div>
-
       </div>
-
     </section>
-  )
+  );
 }

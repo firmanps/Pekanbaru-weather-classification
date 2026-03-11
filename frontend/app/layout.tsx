@@ -1,3 +1,4 @@
+import { WeatherProvider } from "@/lib/weather-context";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
@@ -66,7 +67,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppins.className} antialiased`}>{children}</body>
+      <body className={`${poppins.className} antialiased`}>
+        <WeatherProvider>{children}</WeatherProvider>
+      </body>
     </html>
   );
 }

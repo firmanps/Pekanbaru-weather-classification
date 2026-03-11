@@ -1,13 +1,79 @@
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Brain, ChartColumn, CloudSun } from "lucide-react"
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { useWeather } from "@/lib/weather-context";
+import {
+  ArrowRight,
+  Brain,
+  ChartColumn,
+  CloudDrizzle,
+  CloudLightning,
+  CloudRain,
+  CloudSun,
+  Sun,
+} from "lucide-react";
 
 export default function Hero() {
+  const weather = useWeather();
+
+  function getWeatherIcon() {
+    const condition = weather?.weather?.[0]?.main;
+
+    switch (condition) {
+      case "Clear":
+        return (
+          <Sun size={110} className="text-yellow-500 animate-float-weather" />
+        );
+
+      case "Clouds":
+        return (
+          <CloudSun
+            size={110}
+            className="text-blue-500 animate-float-weather"
+          />
+        );
+
+      case "Rain":
+        return (
+          <CloudRain
+            size={110}
+            className="text-blue-500 animate-float-weather"
+          />
+        );
+
+      case "Thunderstorm":
+        return (
+          <CloudLightning
+            size={110}
+            className="text-purple-500 animate-float-weather"
+          />
+        );
+
+      case "Drizzle":
+        return (
+          <CloudDrizzle
+            size={110}
+            className="text-blue-400 animate-float-weather"
+          />
+        );
+
+      default:
+        return (
+          <CloudSun
+            size={110}
+            className="text-blue-500 animate-float-weather"
+          />
+        );
+    }
+  }
+
+  const temp = weather?.main?.temp;
+  const humidity = weather?.main?.humidity;
+
   return (
     <section className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 py-16 items-center mt-10 px-4">
-
       {/* LEFT CONTENT */}
       <div>
-
         <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-medium transition hover:scale-105">
           <Brain size={16} />
           Weather Classification System
@@ -19,14 +85,15 @@ export default function Hero() {
         </h1>
 
         <p className="text-gray-500 mt-4 max-w-xl">
-          This application predicts daily weather conditions using a machine learning model based on meteorological parameters such as temperature, humidity, rainfall, sunshine duration, and wind speed.
+          This application predicts daily weather conditions using a machine
+          learning model based on meteorological parameters such as temperature,
+          humidity, rainfall, sunshine duration, and wind speed.
         </p>
 
         <div className="flex flex-wrap gap-4 mt-6">
-
           <Button className="bg-blue-600 hover:bg-blue-500 flex items-center gap-2 transition-all hover:-translate-y-1 hover:shadow-lg">
             Predict Weather
-            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1"/>
+            <ArrowRight size={18} />
           </Button>
 
           <Button
@@ -36,45 +103,32 @@ export default function Hero() {
             <ChartColumn size={18} />
             View Forecast
           </Button>
-
         </div>
-
       </div>
-
 
       {/* RIGHT WEATHER ICON */}
-      <div className="flex justify-center">
-
-      <div className="flex justify-center">
-
+      <div className="hidden md:flex justify-center">
         <div className="relative w-64 h-64 md:w-80 md:h-80 group">
-
-          {/* main circle */}
-          <div className="w-full h-full bg-gradient-to-br from-[#D2E3F2] to-[#F0E8D8] rounded-full flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-105">
-
-            <CloudSun
-              size={110}
-              className="text-blue-500 animate-float-weather transition-all duration-300 group-hover:-translate-y-3 group-hover:rotate-6"
-            />
-
+          {/* MAIN CIRCLE */}
+          <div className="w-full h-full bg-linear-to-br from-[#D2E3F2] to-[#F0E8D8] rounded-full flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-105">
+            {getWeatherIcon()}
           </div>
 
-          {/* temperature bubble */}
-          <div className="absolute top-3 right-0 bg-yellow-100 text-yellow-500 font-semibold px-4 py-2 rounded-full shadow text-sm md:text-base animate-float-weather transition-transform duration-300 group-hover:-translate-y-2">
-            30°
-          </div>
+          {/* TEMPERATURE */}
+          {/* {temp && (
+            <div className="absolute top-3 right-0 bg-yellow-100 text-yellow-600 font-semibold px-4 py-2 rounded-full shadow text-sm">
+              {Math.round(temp)}°
+            </div>
+          )} */}
 
-          {/* humidity bubble */}
-          <div className="absolute bottom-4 -left-2 bg-blue-100 text-blue-600 text-sm px-4 py-2 rounded-full shadow animate-float-weather transition-transform duration-300 group-hover:-translate-y-2">
-            75% RH
-          </div>
-
+          {/* HUMIDITY */}
+          {/* {humidity && (
+            <div className="absolute bottom-4 -left-2 bg-blue-100 text-blue-600 text-sm px-4 py-2 rounded-full shadow">
+              {humidity}% RH
+            </div>
+          )} */}
         </div>
-
-        </div>
-
       </div>
-
     </section>
-  )
+  );
 }
