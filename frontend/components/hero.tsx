@@ -7,33 +7,36 @@ import { ArrowRight, Brain, ChartColumn } from "lucide-react";
 export default function Hero() {
   const weather = useWeather();
 
+  // Fungsi scroll universal - Paling reliable
+  const scrollToSection = (sectionId: string) => {
+    const element = document.querySelector(sectionId);
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
   function getWeatherGif() {
     const condition = weather?.weather?.[0]?.main;
-
     switch (condition) {
       case "Clear":
         return "/weather/sunny.gif";
-
       case "Clouds":
         return "/weather/cloudy.gif";
-
       case "Rain":
       case "Drizzle":
         return "/weather/light-rain.gif";
-
       case "Thunderstorm":
         return "/weather/heavy-rain.gif";
-
       default:
         return "/weather/sunny.gif";
     }
   }
 
-  const temp = weather?.main?.temp;
-  const humidity = weather?.main?.humidity;
-
   return (
-    <section className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 py-16 items-center mt-10 px-4">
+    <section id="home" className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 py-16 items-center mt-10 px-4">
       {/* LEFT CONTENT */}
       <div>
         <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-medium transition hover:scale-105">
@@ -53,13 +56,19 @@ export default function Hero() {
         </p>
 
         <div className="flex flex-wrap gap-4 mt-6">
-          <Button className="bg-blue-600 hover:bg-blue-500 flex items-center gap-2 transition-all hover:-translate-y-1 hover:shadow-lg">
+          {/* BUTTON 1: PREDICTION */}
+          <Button
+            onClick={() => scrollToSection("#prediction")}
+            className="bg-blue-600 hover:bg-blue-500 flex items-center gap-2 transition-all hover:-translate-y-1 hover:shadow-lg"
+          >
             Predict Weather
             <ArrowRight size={18} />
           </Button>
 
+          {/* BUTTON 2: FORECAST */}
           <Button
             variant="outline"
+            onClick={() => scrollToSection("#forecast")}
             className="flex items-center gap-2 transition-all hover:-translate-y-1 hover:shadow-md"
           >
             <ChartColumn size={18} />
