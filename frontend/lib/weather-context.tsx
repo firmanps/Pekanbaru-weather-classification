@@ -8,7 +8,7 @@ const WeatherContext = createContext<any>(null);
 export function WeatherProvider({ children }: any) {
   const [weather, setWeather] = useState<any>(null);
 
-  const API_KEY = process.env.WEATHER_API_KEY;
+  const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 
   const fetchWeather = async () => {
     try {

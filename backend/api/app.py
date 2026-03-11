@@ -92,9 +92,9 @@ def prediksi():
 
 if __name__ == '__main__':
     port_env = int(os.getenv("FLASK_PORT", 5000))
-    print(f"🚀 Server Flask berjalan di http://localhost:{port_env}")
     app.run(
-        debug=True, 
+        # false di production
+        debug=True,  
         host='0.0.0.0', 
         port=port_env
     )
