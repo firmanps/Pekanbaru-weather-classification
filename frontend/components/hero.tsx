@@ -2,68 +2,30 @@
 
 import { Button } from "@/components/ui/button";
 import { useWeather } from "@/lib/weather-context";
-import {
-  ArrowRight,
-  Brain,
-  ChartColumn,
-  CloudDrizzle,
-  CloudLightning,
-  CloudRain,
-  CloudSun,
-  Sun,
-} from "lucide-react";
+import { ArrowRight, Brain, ChartColumn } from "lucide-react";
 
 export default function Hero() {
   const weather = useWeather();
 
-  function getWeatherIcon() {
+  function getWeatherGif() {
     const condition = weather?.weather?.[0]?.main;
 
     switch (condition) {
       case "Clear":
-        return (
-          <Sun size={110} className="text-yellow-500 animate-float-weather" />
-        );
+        return "/weather/sunny.gif";
 
       case "Clouds":
-        return (
-          <CloudSun
-            size={110}
-            className="text-blue-500 animate-float-weather"
-          />
-        );
+        return "/weather/cloudy.gif";
 
       case "Rain":
-        return (
-          <CloudRain
-            size={110}
-            className="text-blue-500 animate-float-weather"
-          />
-        );
+      case "Drizzle":
+        return "/weather/light-rain.gif";
 
       case "Thunderstorm":
-        return (
-          <CloudLightning
-            size={110}
-            className="text-purple-500 animate-float-weather"
-          />
-        );
-
-      case "Drizzle":
-        return (
-          <CloudDrizzle
-            size={110}
-            className="text-blue-400 animate-float-weather"
-          />
-        );
+        return "/weather/heavy-rain.gif";
 
       default:
-        return (
-          <CloudSun
-            size={110}
-            className="text-blue-500 animate-float-weather"
-          />
-        );
+        return "/weather/sunny.gif";
     }
   }
 
@@ -111,7 +73,11 @@ export default function Hero() {
         <div className="relative w-64 h-64 md:w-80 md:h-80 group">
           {/* MAIN CIRCLE */}
           <div className="w-full h-full bg-linear-to-br from-[#D2E3F2] to-[#F0E8D8] rounded-full flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-105">
-            {getWeatherIcon()}
+            <img
+              src={getWeatherGif()}
+              alt="weather icon"
+              className="w-52 h-52 object-contain animate-float-weather rounded-full"
+            />
           </div>
 
           {/* TEMPERATURE */}
