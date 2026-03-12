@@ -69,7 +69,7 @@ export default function InstallPWA() {
   if (!showPopup) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999] w-[calc(100%-2rem)] max-w-sm">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-9999 w-[calc(100%-2rem)] max-w-sm">
       <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 flex items-center gap-4">
         {/* Icon — pakai gambar kamu */}
         <div className="shrink-0 w-12 h-12 rounded-xl overflow-hidden">

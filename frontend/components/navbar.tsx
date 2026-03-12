@@ -7,23 +7,35 @@ import { useState } from "react";
 
 export default function Navbar() {
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [pendingInstall, setPendingInstall] = useState(false);
 
-  // Fungsi scroll sama persis seperti Hero
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
     if (element) {
-      element.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
   const openInstallPopup = () => {
-    setSheetOpen(false); // ← tutup sidebar dulu
-    setTimeout(() => {
+    if (sheetOpen) {
+      // Sheet masih terbuka — tutup dulu, dispatch setelah animasi selesai
+      setPendingInstall(true);
+      setSheetOpen(false);
+    } else {
+      // Sheet sudah tutup / desktop — langsung dispatch
       window.dispatchEvent(new Event("open-pwa-install"));
-    }, 300);
+    }
+  };
+
+  const handleSheetOpenChange = (open: boolean) => {
+    setSheetOpen(open);
+    // Sheet baru saja ditutup dan ada pending install
+    if (!open && pendingInstall) {
+      setPendingInstall(false);
+      setTimeout(() => {
+        window.dispatchEvent(new Event("open-pwa-install"));
+      }, 100); // delay kecil setelah animasi close selesai
+    }
   };
 
   return (
@@ -35,7 +47,7 @@ export default function Navbar() {
           Weather Prediction
         </div>
 
-        {/* Desktop Menu - SEMUA DIPERBAIKI */}
+        {/* Desktop Menu */}
         <nav className="hidden md:flex gap-8">
           <button
             onClick={() => scrollToSection("#home")}
@@ -43,21 +55,18 @@ export default function Navbar() {
           >
             Home
           </button>
-
           <button
             onClick={() => scrollToSection("#forecast")}
             className="hover:text-blue-500 px-2 py-1 rounded transition-colors"
           >
             Forecast
           </button>
-
           <button
             onClick={() => scrollToSection("#prediction")}
             className="hover:text-blue-500 px-2 py-1 rounded transition-colors"
           >
             Prediction
           </button>
-
           <button
             onClick={openInstallPopup}
             className="hover:text-blue-500 px-2 py-1 rounded transition-colors"
@@ -66,9 +75,10 @@ export default function Navbar() {
           </button>
         </nav>
 
-        {/* Mobile Menu - SHEET */}
+        {/* Mobile Menu */}
         <div className="md:hidden">
-          <Sheet>
+          {/* ↓ Sheet sekarang controlled */}
+          <Sheet open={sheetOpen} onOpenChange={handleSheetOpenChange}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Menu />
@@ -77,33 +87,27 @@ export default function Navbar() {
 
             <SheetContent side="right" className="w-64">
               <div className="mt-8 flex flex-col gap-2 text-lg m-3">
-                {/* MOBILE HOME */}
                 <button
-                  onClick={() => scrollToSection("#home")}
+                  onClick={() => { setSheetOpen(false); scrollToSection("#home"); }}
                   className="flex items-center gap-3 hover:text-blue-500 border-b py-3 w-full text-left"
                 >
                   <Home size={20} />
                   Home
                 </button>
-
-                {/* MOBILE FORECAST */}
                 <button
-                  onClick={() => scrollToSection("#forecast")}
+                  onClick={() => { setSheetOpen(false); scrollToSection("#forecast"); }}
                   className="flex items-center gap-3 hover:text-blue-500 border-b py-3 w-full text-left"
                 >
                   <CloudSun size={20} />
                   Forecast
                 </button>
-
-                {/* MOBILE PREDICTION */}
                 <button
-                  onClick={() => scrollToSection("#prediction")}
+                  onClick={() => { setSheetOpen(false); scrollToSection("#prediction"); }}
                   className="flex items-center gap-3 hover:text-blue-500 border-b py-3 w-full text-left"
                 >
                   <Brain size={20} />
                   Prediction
                 </button>
-
                 <button
                   onClick={openInstallPopup}
                   className="flex items-center gap-3 hover:text-blue-500 border-b py-3 w-full text-left"
