@@ -5,7 +5,7 @@
   "description": "Machine learning based weather prediction system using Random Forest.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#ffffff", 
   "theme_color": "#2563eb",
   "orientation": "portrait",
   "icons": [
