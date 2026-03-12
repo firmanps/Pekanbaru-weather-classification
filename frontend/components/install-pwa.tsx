@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -66,51 +67,64 @@ export default function InstallPWA() {
     setManuallyOpened(false);
   };
 
-  if (!showPopup) return null;
-
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999] w-[calc(100%-2rem)] max-w-sm">
-      <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 flex items-center gap-4">
-        {/* Icon — pakai gambar kamu */}
-        <div className="shrink-0 w-12 h-12 rounded-xl overflow-hidden">
-          <img
-            src="/img/web-app-manifest-192x192.png"
-            alt="Weather App Icon"
-            width={48}
-            height={48}
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* Text */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900 truncate">
-            Install Weather App
-          </p>
-          <p className="text-xs text-gray-500 mt-0.5">
-            {deferredPrompt
-              ? "Akses lebih cepat!"
-              : "Gunakan menu Install di browser kamu."}
-          </p>
-        </div>
-
-        {/* Buttons */}
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={handleDismiss}
-            className="text-xs text-gray-400 hover:text-gray-600 transition-colors px-2 py-1"
+    <AnimatePresence>
+      {showPopup ? (
+        <motion.div
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-9999 w-[calc(100%-2rem)] max-w-sm"
+          initial={{ opacity: 0, y: 18, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 18, scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 220, damping: 20 }}
+        >
+          <motion.div
+            className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 flex items-center gap-4"
+            whileHover={{ y: -2 }}
+            transition={{ type: "spring", stiffness: 260, damping: 18 }}
           >
-            Tutup
-          </button>
-          <button
-            onClick={handleInstall}
-            disabled={!deferredPrompt}
-            className="text-xs font-semibold bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg transition-colors"
-          >
-            Install
-          </button>
-        </div>
-      </div>
-    </div>
+            {/* Icon — pakai gambar kamu */}
+            <div className="shrink-0 w-12 h-12 rounded-xl overflow-hidden">
+              <img
+                src="/img/web-app-manifest-192x192.png"
+                alt="Weather App Icon"
+                width={48}
+                height={48}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Text */}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 truncate">
+                Install Weather App
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {deferredPrompt
+                  ? "Akses lebih cepat!"
+                  : "Gunakan menu Install di browser kamu."}
+              </p>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={handleDismiss}
+                className="text-xs text-gray-400 hover:text-gray-600 transition-colors px-2 py-1"
+              >
+                Tutup
+              </button>
+              <motion.button
+                onClick={handleInstall}
+                disabled={!deferredPrompt}
+                whileTap={{ scale: 0.98 }}
+                className="text-xs font-semibold bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Install
+              </motion.button>
+            </div>
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }

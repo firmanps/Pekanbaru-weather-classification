@@ -2,6 +2,7 @@
 
 import axiosInstance from "@/lib/axios";
 import { useWeather } from "@/lib/weather-context";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export default function Forecast() {
@@ -121,7 +122,12 @@ export default function Forecast() {
       </p>
 
       <div className="flex justify-center">
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ type: "spring", stiffness: 140, damping: 18 }}
+          whileHover={{ y: -4 }}
           className="
           group
           border
@@ -137,11 +143,12 @@ export default function Forecast() {
           transition-all
           duration-300
           hover:shadow-xl
-          hover:-translate-y-1
           "
         >
           {/* Icon */}
-          <div
+          <motion.div
+            whileHover={{ rotate: 2, scale: 1.04 }}
+            transition={{ type: "spring", stiffness: 240, damping: 16 }}
             className="
             w-20
             h-20
@@ -162,7 +169,7 @@ export default function Forecast() {
                 className="w-14 h-14"
               />
             )}
-          </div>
+          </motion.div>
 
           {/* Text */}
           <div>
@@ -180,7 +187,7 @@ export default function Forecast() {
               </p>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
