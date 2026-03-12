@@ -8,32 +8,46 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const STORAGE_KEY = "pwa-install-dismissed";
+const OPEN_EVENT_NAME = "open-pwa-install";
 
 export default function InstallPWA() {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [manuallyOpened, setManuallyOpened] = useState(false);
 
   useEffect(() => {
-    // Jika sudah pernah dismiss atau sudah terinstall, jangan tampilkan
-    const alreadyDismissed = localStorage.getItem(STORAGE_KEY);
-    if (alreadyDismissed) return;
-
-    const handler = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setShowPopup(true);
-    };
-
-    window.addEventListener("beforeinstallprompt", handler);
-
     // Deteksi jika sudah terinstall sebagai PWA
     if (window.matchMedia("(display-mode: standalone)").matches) {
       localStorage.setItem(STORAGE_KEY, "true");
       return;
     }
 
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    const handler = (e: Event) => {
+      e.preventDefault();
+      // Selalu simpan prompt, apapun kondisinya
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+
+      // Popup otomatis hanya jika belum pernah dismiss
+      const alreadyDismissed = localStorage.getItem(STORAGE_KEY);
+      if (!alreadyDismissed) {
+        setShowPopup(true);
+      }
+    };
+
+    const openHandler = () => {
+      setManuallyOpened(true);
+      setShowPopup(true);
+      // deferredPrompt sudah tersimpan dari handler sebelumnya ✅
+    };
+
+    window.addEventListener("beforeinstallprompt", handler);
+    window.addEventListener(OPEN_EVENT_NAME, openHandler);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+      window.removeEventListener(OPEN_EVENT_NAME, openHandler);
+    };
   }, []);
 
   const handleInstall = async () => {
@@ -47,18 +61,23 @@ export default function InstallPWA() {
     }
 
     setShowPopup(false);
+    setManuallyOpened(false);
     setDeferredPrompt(null);
   };
 
   const handleDismiss = () => {
-    localStorage.setItem(STORAGE_KEY, "true");
+    if (!manuallyOpened) {
+      // Hanya set storage jika bukan manual open
+      localStorage.setItem(STORAGE_KEY, "true");
+    }
     setShowPopup(false);
+    setManuallyOpened(false);
   };
 
   if (!showPopup) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-9999 w-[calc(100%-2rem)] max-w-sm">
       <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 flex items-center gap-4">
         {/* Icon */}
         <div className="shrink-0 w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center">
@@ -83,7 +102,9 @@ export default function InstallPWA() {
             Install Weather App
           </p>
           <p className="text-xs text-gray-500 mt-0.5">
-            Akses lebih cepat, bisa offline!
+            {deferredPrompt
+              ? "Akses lebih cepat, bisa offline!"
+              : "Gunakan menu Install di browser kamu."}
           </p>
         </div>
 
@@ -93,11 +114,12 @@ export default function InstallPWA() {
             onClick={handleDismiss}
             className="text-xs text-gray-400 hover:text-gray-600 transition-colors px-2 py-1"
           >
-            Nanti
+            Tutup
           </button>
           <button
             onClick={handleInstall}
-            className="text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition-colors"
+            disabled={!deferredPrompt}
+            className="text-xs font-semibold bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg transition-colors"
           >
             Install
           </button>
