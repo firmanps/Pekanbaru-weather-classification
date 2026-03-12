@@ -7,7 +7,6 @@ import { useState } from "react";
 
 export default function Navbar() {
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [pendingInstall, setPendingInstall] = useState(false);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
@@ -19,24 +18,17 @@ export default function Navbar() {
   const openInstallPopup = () => {
     if (sheetOpen) {
       // Sheet masih terbuka — tutup dulu, dispatch setelah animasi selesai
-      setPendingInstall(true);
       setSheetOpen(false);
+      setTimeout(() => {
+        window.dispatchEvent(new Event("open-pwa-install"));
+      }, 150);
     } else {
       // Sheet sudah tutup / desktop — langsung dispatch
       window.dispatchEvent(new Event("open-pwa-install"));
     }
   };
 
-  const handleSheetOpenChange = (open: boolean) => {
-    setSheetOpen(open);
-    // Sheet baru saja ditutup dan ada pending install
-    if (!open && pendingInstall) {
-      setPendingInstall(false);
-      setTimeout(() => {
-        window.dispatchEvent(new Event("open-pwa-install"));
-      }, 100); // delay kecil setelah animasi close selesai
-    }
-  };
+  const handleSheetOpenChange = (open: boolean) => setSheetOpen(open);
 
   return (
     <header className="w-full border-b fixed top-0 left-0 z-50 bg-white/10 backdrop-blur-3xl">
