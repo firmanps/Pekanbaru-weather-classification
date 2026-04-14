@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Brain, CloudSun, Download, Home, Menu } from "lucide-react";
+import { CloudSun, Download, Home, Menu } from "lucide-react";
 import { useState } from "react";
 
 export default function Navbar() {
@@ -47,12 +47,12 @@ export default function Navbar() {
           >
             Home
           </button>
-          <button
+          {/* <button
             onClick={() => scrollToSection("#forecast")}
             className="hover:text-blue-500 px-2 py-1 rounded transition-colors"
           >
             Forecast
-          </button>
+          </button> */}
           <button
             onClick={() => scrollToSection("#prediction")}
             className="hover:text-blue-500 px-2 py-1 rounded transition-colors"
@@ -80,26 +80,32 @@ export default function Navbar() {
             <SheetContent side="right" className="w-64">
               <div className="mt-8 flex flex-col gap-2 text-lg m-3">
                 <button
-                  onClick={() => { setSheetOpen(false); scrollToSection("#home"); }}
+                  onClick={() => {
+                    setSheetOpen(false);
+                    scrollToSection("#home");
+                  }}
                   className="flex items-center gap-3 hover:text-blue-500 border-b py-3 w-full text-left"
                 >
                   <Home size={20} />
                   Home
                 </button>
                 <button
-                  onClick={() => { setSheetOpen(false); scrollToSection("#forecast"); }}
+                  onClick={() => {
+                    setSheetOpen(false);
+                    scrollToSection("#forecast");
+                  }}
                   className="flex items-center gap-3 hover:text-blue-500 border-b py-3 w-full text-left"
                 >
                   <CloudSun size={20} />
                   Forecast
                 </button>
-                <button
+                {/* <button
                   onClick={() => { setSheetOpen(false); scrollToSection("#prediction"); }}
                   className="flex items-center gap-3 hover:text-blue-500 border-b py-3 w-full text-left"
                 >
                   <Brain size={20} />
                   Prediction
-                </button>
+                </button> */}
                 <button
                   onClick={openInstallPopup}
                   className="flex items-center gap-3 hover:text-blue-500 border-b py-3 w-full text-left"

@@ -1,6 +1,5 @@
 import CurrentWeather from "@/components/current-weather"
 import Footer from "@/components/footer"
-import Forecast from "@/components/forecast"
 import Hero from "@/components/hero"
 import Reveal from "@/components/motion/reveal"
 import Navbar from "@/components/navbar"
@@ -19,9 +18,9 @@ export default function Home() {
         <CurrentWeather />
       </Reveal>
 
-      <Reveal delay={0.05}>
+      {/* <Reveal delay={0.05}>
         <Forecast />
-      </Reveal>
+      </Reveal> */}
 
       <Reveal delay={0.05}>
         <PredictionForm />

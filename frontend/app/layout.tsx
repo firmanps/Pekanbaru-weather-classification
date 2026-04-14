@@ -1,5 +1,4 @@
 import InstallPWA from "@/components/install-pwa";
-import MotionProvider from "@/components/motion/provider";
 import { WeatherProvider } from "@/lib/weather-context";
 import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
@@ -74,12 +73,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
-        <MotionProvider>
-          <WeatherProvider>
-            {children}
-            <InstallPWA />
-          </WeatherProvider>
-        </MotionProvider>
+        <WeatherProvider>
+          {children}
+          <InstallPWA />
+        </WeatherProvider>
       </body>
     </html>
   );
