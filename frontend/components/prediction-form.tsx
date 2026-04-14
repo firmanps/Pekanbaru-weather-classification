@@ -188,11 +188,11 @@ export default function PredictionForm() {
   return (
     <section id="prediction" className="max-w-4xl mx-auto py-16 px-4">
       <h2 className="text-center text-2xl font-semibold">
-        Machine Learning Weather Prediction
+        Machine Learning Weather Classification
       </h2>
 
       <p className="text-center text-gray-500 mb-8">
-        Enter meteorological parameters to predict weather conditions
+        Enter meteorological parameters to classify weather conditions
       </p>
 
       <Card className="p-8 space-y-6">
@@ -313,7 +313,7 @@ export default function PredictionForm() {
               className="flex items-center justify-center gap-2 w-full sm:flex-1 bg-blue-600 hover:bg-blue-500 transition duration-300 hover:scale-[1.02]"
             >
               <Send size={18} />
-              {isSubmitting ? "Predicting..." : "Predict Weather"}
+              {isSubmitting ? "Classifying..." : "Classify Weather"}
             </Button>
 
             <Button
@@ -334,7 +334,7 @@ export default function PredictionForm() {
       {result && (
         <Card className="mt-8 p-10 text-center bg-[#e8dfd2] border-none animate-in fade-in slide-in-from-bottom-6 duration-700 hover:scale-[1.02] transition-transform">
           <p className="text-sm tracking-widest text-gray-500">
-            PREDICTION RESULT
+            CLASSIFICATION RESULT
           </p>
 
           <div className="flex justify-center my-6">

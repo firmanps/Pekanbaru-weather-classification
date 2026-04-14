@@ -1,9 +1,9 @@
-import CurrentWeather from "@/components/current-weather"
-import Footer from "@/components/footer"
-import Hero from "@/components/hero"
-import Reveal from "@/components/motion/reveal"
-import Navbar from "@/components/navbar"
-import PredictionForm from "@/components/prediction-form"
+import CurrentWeather from "@/components/current-weather";
+import Footer from "@/components/footer";
+import Hero from "@/components/hero";
+import Reveal from "@/components/motion/reveal";
+import Navbar from "@/components/navbar";
+import PredictionForm from "@/components/prediction-form";
 
 export default function Home() {
   return (
@@ -30,5 +30,5 @@ export default function Home() {
         <Footer />
       </Reveal>
     </main>
-  )
+  );
 }

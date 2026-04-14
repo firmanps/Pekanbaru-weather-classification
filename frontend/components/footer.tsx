@@ -9,7 +9,7 @@ export default function Footer() {
             <CloudSun size={28} className="text-blue-400"/>
             <div>
               <h2 className="font-semibold text-lg">
-                Weather Prediction System
+                Weather Classification System
               </h2>
               <p className="text-sm text-gray-400">
                 Machine Learning Project
@@ -27,7 +27,7 @@ export default function Footer() {
   
         {/* Bottom */}
         <div className="border-t border-slate-700 text-center py-4 text-sm text-gray-400">
-          © 2026 Weather Prediction System • Machine Learning Project
+          © 2026 Weather Classification System • Machine Learning Project
         </div>
       </footer>
     )

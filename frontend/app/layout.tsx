@@ -17,18 +17,18 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://pekanbaru-weather.firmanps.my.id"),
 
-  title: "Weather Prediction System | Machine Learning Forecast",
+  title: "Weather Classification System | Machine Learning Forecast",
   description:
-    "Weather Prediction System is a machine learning web application that predicts weather conditions using Random Forest algorithm based on meteorological data.",
+    "Weather Classification System is a machine learning web application that classifies weather conditions using Random Forest algorithm based on meteorological data.",
 
   manifest: "/manifest.json",
 
   keywords: [
-    "weather prediction",
+    "weather classification",
     "machine learning weather",
-    "random forest weather prediction",
+    "random forest weather classification",
     "weather forecasting system",
-    "meteorological prediction",
+    "meteorological classification",
   ],
 
   authors: [{ name: "Firman PS" }],
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Weather Prediction System",
+    title: "Weather Classification System",
   },
 
   icons: {
@@ -47,17 +47,17 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: "Weather Prediction System",
+    title: "Weather Classification System",
     description:
-      "Machine Learning based weather prediction system using Random Forest algorithm.",
+      "Machine Learning based weather classification system using Random Forest algorithm.",
     url: "https://pekanbaru-weather.firmanps.my.id",
-    siteName: "Weather Prediction System",
+    siteName: "Weather Classification System",
     images: [
       {
         url: "/img/web-app-manifest-512x512.png",
         width: 512,
         height: 512,
-        alt: "Weather Prediction Logo",
+        alt: "Weather Classification Logo",
       },
     ],
     locale: "en_US",

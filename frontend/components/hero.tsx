@@ -1,12 +1,16 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import axiosInstance from "@/lib/axios";
 import { useWeather } from "@/lib/weather-context";
 import { motion } from "framer-motion";
 import { ArrowRight, Brain, ChartColumn } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function Hero() {
   const weather = useWeather();
+  const [aiPrediction, setAiPrediction] = useState<string | null>(null);
+  const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 
   // Fungsi scroll universal - Paling reliable
   const scrollToSection = (sectionId: string) => {
@@ -19,17 +23,57 @@ export default function Hero() {
     }
   };
 
-  function getWeatherGif() {
-    const condition = weather?.weather?.[0]?.main;
-    switch (condition) {
-      case "Clear":
+  useEffect(() => {
+    if (!weather) return;
+
+    const fetchPrediction = async () => {
+      try {
+        const forecastRes = await axiosInstance.get(
+          `https://api.openweathermap.org/data/2.5/forecast?q=Pekanbaru&units=metric&appid=${API_KEY}`
+        );
+
+        const list = forecastRes.data.list;
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowDate = tomorrow.toISOString().split("T")[0];
+
+        const tomorrowData = list.filter((item: any) =>
+          item.dt_txt.startsWith(tomorrowDate)
+        );
+        if (!tomorrowData.length) return;
+
+        const temps = tomorrowData.map((item: any) => item.main.temp);
+        const TN = Math.min(...temps);
+        const TX = Math.max(...temps);
+
+        const dataset = {
+          TN,
+          TX,
+          TAVG: weather.main.temp,
+          RH_AVG: weather.main.humidity,
+          SS: (100 - weather.clouds.all) / 10,
+          FF_AVG: weather.wind.speed,
+        };
+
+        const prediksiRes = await axiosInstance.post("/prediksi", dataset);
+        setAiPrediction(prediksiRes.data?.cuaca ?? null);
+      } catch (error) {
+        console.error("Gagal fetch prediksi cuaca hero:", error);
+      }
+    };
+
+    fetchPrediction();
+  }, [weather, API_KEY]);
+
+  function getWeatherGif(cuaca: string | null) {
+    switch (cuaca) {
+      case "Cerah":
         return "/weather/sunny.gif";
-      case "Clouds":
+      case "Berawan":
         return "/weather/cloudy.gif";
-      case "Rain":
-      case "Drizzle":
+      case "Hujan Ringan":
         return "/weather/light-rain.gif";
-      case "Thunderstorm":
+      case "Hujan Lebat":
         return "/weather/heavy-rain.gif";
       default:
         return "/weather/sunny.gif";
@@ -69,7 +113,7 @@ export default function Hero() {
           }}
           className="text-4xl md:text-5xl font-bold mt-4 leading-tight"
         >
-          Weather Prediction <br />
+          Weather Classification <br />
           System for <span className="text-blue-600">Pekanbaru</span>
         </motion.h1>
 
@@ -80,7 +124,7 @@ export default function Hero() {
           }}
           className="text-gray-500 mt-4 max-w-xl"
         >
-          This application predicts daily weather conditions using a machine
+          This application classifies daily weather conditions using a machine
           learning model based on meteorological parameters such as temperature,
           humidity, rainfall, sunshine duration, and wind speed.
         </motion.p>
@@ -92,13 +136,13 @@ export default function Hero() {
           }}
           className="flex flex-wrap gap-4 mt-6"
         >
-          {/* BUTTON 1: PREDICTION */}
+          {/* BUTTON 1: CLASSIFICATION */}
           <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }}>
             <Button
               onClick={() => scrollToSection("#prediction")}
               className="bg-blue-600 hover:bg-blue-500 flex items-center gap-2 transition-all hover:shadow-lg"
             >
-              Predict Weather
+              Classify Weather
               <ArrowRight size={18} />
             </Button>
           </motion.div>
@@ -133,7 +177,7 @@ export default function Hero() {
             transition={{ type: "spring", stiffness: 200, damping: 18 }}
           >
             <motion.img
-              src={getWeatherGif()}
+              src={getWeatherGif(aiPrediction)}
               alt="weather icon"
               className="w-52 h-52 object-contain animate-float-weather rounded-full"
               whileHover={{ scale: 1.04 }}

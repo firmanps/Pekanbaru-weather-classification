@@ -118,7 +118,7 @@ export default function Forecast() {
       </h2>
 
       <p className="text-center text-gray-500 mb-10">
-        AI prediction for tomorrow based on weather data
+        AI classification for tomorrow based on weather data
       </p>
 
       <div className="flex justify-center">
@@ -178,7 +178,7 @@ export default function Forecast() {
             <p className="font-semibold text-lg">{getTomorrowDate()}</p>
 
             <p className="text-gray-500">
-              {forecast?.cuaca || "Predicting..."}
+              {forecast?.cuaca || "Classifying..."}
             </p>
 
             {forecast && (

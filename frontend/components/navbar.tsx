@@ -36,7 +36,7 @@ export default function Navbar() {
         {/* Logo */}
         <div className="flex items-center gap-2 font-semibold text-lg">
           <CloudSun className="text-blue-500" />
-          Weather Prediction
+          Weather Classification
         </div>
 
         {/* Desktop Menu */}
@@ -57,7 +57,7 @@ export default function Navbar() {
             onClick={() => scrollToSection("#prediction")}
             className="hover:text-blue-500 px-2 py-1 rounded transition-colors"
           >
-            Prediction
+            Classification
           </button>
           <button
             onClick={openInstallPopup}
