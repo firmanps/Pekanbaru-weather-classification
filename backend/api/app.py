@@ -214,7 +214,7 @@ def prediksi():
             'status': 'success',
             'cuaca': hasil,
             'icon': icon_map.get(hasil, '🌤️'),
-            'pesan': f'Prediksi cuaca hari ini: {hasil}'
+            'pesan': f'Klasifikasi cuaca hari ini: {hasil}'
         })
 
     except Exception as e:
