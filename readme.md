@@ -1,11 +1,11 @@
-# 🌤️ Prediksi Cuaca Kota Pekanbaru
+# 🌤️ Klasifikasi Cuaca Kota Pekanbaru
 ### Klasifikasi Kondisi Cuaca Harian Kota Pekanbaru Menggunakan Algoritma Random Forest Berbasis Data BMKG
 
 ---
 
 ## 📋 Deskripsi Project
 
-Project ini merupakan sistem prediksi kondisi cuaca harian Kota Pekanbaru menggunakan algoritma **Random Forest**. Sistem ini mampu mengklasifikasikan kondisi cuaca menjadi 4 kategori: **Cerah**, **Berawan**, **Hujan Ringan**, dan **Hujan Lebat** berdasarkan data iklim historis dari BMKG.
+Project ini merupakan sistem klasifikasi kondisi cuaca harian Kota Pekanbaru menggunakan algoritma **Random Forest**. Sistem ini mampu mengklasifikasikan kondisi cuaca menjadi 4 kategori: **Cerah**, **Berawan**, **Hujan Ringan**, dan **Hujan Lebat** berdasarkan data iklim historis dari BMKG.
 
 Project ini terdiri dari dua bagian utama:
 - **Backend** — Python Flask sebagai API
@@ -16,7 +16,7 @@ Project ini terdiri dari dua bagian utama:
 ## 🗂️ Struktur Folder
 
 ```
-weather-prediction/
+weather-classification/
 │
 │
 ├── backend/
@@ -64,7 +64,7 @@ weather-prediction/
 
 ### `POST /prediksi`
 
-Memprediksi kondisi cuaca berdasarkan data iklim yang dikirim.
+Mengklasifikasikan kondisi cuaca berdasarkan data iklim yang dikirim.
 
 **URL:** `http://127.0.0.1:5000/prediksi`
 
@@ -98,7 +98,7 @@ Memprediksi kondisi cuaca berdasarkan data iklim yang dikirim.
     "status": "success",
     "cuaca": "Cerah",
     "icon": "☀️",
-    "pesan": "Prediksi cuaca hari ini: Cerah"
+    "pesan": "klasifikasi cuaca hari ini: Cerah"
 }
 ```
 
