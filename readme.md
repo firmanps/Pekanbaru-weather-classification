@@ -1,150 +1,151 @@
 # 🌤️ Klasifikasi Cuaca Kota Pekanbaru
-### Klasifikasi Kondisi Cuaca Harian Kota Pekanbaru Menggunakan Algoritma Random Forest Berbasis Data BMKG
-
----
+### Klasifikasi Kondisi Cuaca Harian Menggunakan Random Forest
 
 ## 📋 Deskripsi Project
 
-Project ini merupakan sistem klasifikasi kondisi cuaca harian Kota Pekanbaru menggunakan algoritma **Random Forest**. Sistem ini mampu mengklasifikasikan kondisi cuaca menjadi 4 kategori: **Cerah**, **Berawan**, **Hujan Ringan**, dan **Hujan Lebat** berdasarkan data iklim historis dari BMKG.
+Project ini adalah sistem klasifikasi cuaca Kota Pekanbaru berbasis **Random Forest** dengan arsitektur:
+- **Backend**: Flask API untuk endpoint prediksi model
+- **Frontend**: Next.js untuk tampilan dashboard cuaca dan form prediksi
 
-Project ini terdiri dari dua bagian utama:
-- **Backend** — Python Flask sebagai API
-- **Frontend** — Next.js sebagai tampilan website
-
----
+Model yang dipakai saat ini adalah `model_random_forest.pkl` (hasil training pada `training_model2.ipynb`) dengan kelas:
+- `Cerah`
+- `Berawan`
+- `Hujan`
 
 ## 🗂️ Struktur Folder
 
-```
+```text
 weather-classification/
-│
-│
 ├── backend/
 │   ├── api/
-│   │   └── app.py                     # Flask Api 
-│   │
-│   └──ml/
-│       ├── dataset/                   # Dataset BMKG
-│       ├── img/                       # Image Confusion Matrix
-│       ├── model/                     # Model Random Forest
+│   │   └── app.py
+│   └── ml/
+│       ├── dataset/
+│       ├── img/
+│       ├── model/
+│       │   └── model_random_forest.pkl
 │       └── notebook/
-│           └── training_model.ipynb   # Notebook training model
-│
-└── frontend/                          # Project Next.js
+│           └── training_model2.ipynb
+└── frontend/
     ├── app/
-    ├── public/
+    ├── components/
+    ├── lib/
     └── package.json
 ```
 
----
-
-## 🛠️ Teknologi yang Digunakan
+## 🛠️ Teknologi
 
 | Bagian | Teknologi |
 |---|---|
 | Machine Learning | Python, Scikit-learn (Random Forest) |
 | Data Processing | Pandas, NumPy |
-| Visualisasi | Matplotlib, Seaborn |
-| Backend API | Python Flask, Flask-CORS |
-| Frontend | Next.js, Tailwind CSS, Axios |
-| Dataset | BMKG (Badan Meteorologi, Klimatologi, dan Geofisika) |
+| Backend API | Flask, Flask-CORS, joblib |
+| Frontend | Next.js 16, React 19, Tailwind CSS, Axios, shadcn/ui |
+| Data Cuaca | NASA POWER (training) & OpenWeather API (frontend live data) |
 
----
+## ⚙️ Menjalankan Project
 
-## 📦 Instalasi
+### 1) Backend
 
-### Prasyarat
-- Python 3.10 / 3.11
-- Node.js 18+
-- pip
+Masuk ke folder backend:
 
----
+```bash
+cd backend
+python .\api\app.py
+```
+
+Default server berjalan di `http://127.0.0.1:5000` (atau sesuai `FLASK_PORT`).
+
+### 2) Frontend
+
+Masuk ke folder frontend:
+
+```bash
+cd frontend
+pnpm install
+pnpm dev
+```
+
+Frontend berjalan di `http://localhost:3000`.
 
 ## 🔌 Dokumentasi API
 
 ### `POST /prediksi`
 
-Mengklasifikasikan kondisi cuaca berdasarkan data iklim yang dikirim.
+Mengklasifikasikan cuaca berdasarkan parameter meteorologi.
 
-**URL:** `http://127.0.0.1:5000/prediksi`
+**Contoh URL:**
+`http://127.0.0.1:5002/prediksi`
 
 **Request Body (JSON):**
+
 ```json
 {
-    "TN": 23.5,
-    "TX": 33.0,
-    "TAVG": 27.5,
-    "RH_AVG": 85.0,
-    "RR": 0.0,
-    "SS": 7.0,
-    "FF_AVG": 2.0
+  "TN": 24.5,
+  "TX": 32.1,
+  "TAVG": 28.0,
+  "RH_AVG": 80.0,
+  "FF_AVG": 3.2,
+  "SOLAR": 5.0,
+  "SOLAR_CLEAR": 6.5
 }
 ```
 
-**Keterangan Parameter:**
+**Keterangan parameter:**
+
 | Parameter | Keterangan | Satuan |
 |---|---|---|
 | TN | Suhu minimum | °C |
 | TX | Suhu maksimum | °C |
 | TAVG | Suhu rata-rata | °C |
-| RH_AVG | Kelembaban udara rata-rata | % |
-| RR | Curah hujan | mm |
-| SS | Lama penyinaran matahari | jam |
+| RH_AVG | Kelembaban relatif rata-rata | % |
 | FF_AVG | Kecepatan angin rata-rata | m/s |
+| SOLAR | Radiasi matahari aktual | kWh/m²/hari |
+| SOLAR_CLEAR | Radiasi clear sky | kWh/m²/hari |
 
-**Response Berhasil:**
+**Response sukses:**
+
 ```json
 {
-    "status": "success",
-    "cuaca": "Cerah",
-    "icon": "☀️",
-    "pesan": "klasifikasi cuaca hari ini: Cerah"
+  "status": "success",
+  "cuaca": "Berawan",
+  "icon": "⛅",
+  "pesan": "Klasifikasi cuaca hari ini: Berawan"
 }
 ```
 
-**Kategori Cuaca:**
-| Kondisi | Keterangan |
-|---|---|
-| ☀️ Cerah | RR = 0 mm dan SS ≥ 6 jam |
-| ⛅ Berawan | RR = 0 mm dan SS < 6 jam |
-| 🌧️ Hujan Ringan | 0 < RR ≤ 20 mm |
-| ⛈️ Hujan Lebat | RR > 20 mm |
+**Response error (contoh validasi):**
 
----
+```json
+{
+  "status": "error",
+  "message": "semua field wajib diisi",
+  "field_kosong": ["SOLAR"]
+}
+```
 
-## 📊 Dataset
+## 🤖 Ringkasan Model
 
-- **Sumber:** BMKG (dataonline.bmkg.go.id)
-- **Stasiun:** Stasiun Meteorologi Sultan Syarif Kasim II, Pekanbaru
-- **Periode:** Maret 2024 – Maret 2026
-- **Jumlah Data:** ±729 baris (harian)
-- **Missing Value:** Nilai 8888 dan 9999 dihapus saat preprocessing
+- **Algoritma**: Random Forest Classifier
+- **Training notebook**: `backend/ml/notebook/training_model2.ipynb`
+- **Fitur model (final)**:
+  - `TN`, `TX`, `TAVG`, `RH_AVG`, `FF_AVG`, `SOLAR`, `SOLAR_CLEAR`
+  - `TEMP_RANGE`, `TEMP_AVG_HUM`, `HUMIDITY_HEAT`, `WIND_TEMP`, `CLEAR_SKY_RATIO`
+- **Label**: `Cerah`, `Berawan`, `Hujan`
 
----
+## 🌐 Catatan Frontend
 
-## 🤖 Model Machine Learning
-
-- **Algoritma:** Random Forest Classifier
-- **Parameter:**
-  - n_estimators: 100
-  - max_depth: 10
-  - min_samples_split: 5
-  - min_samples_leaf: 3
-- **Split Data:** 80% Training / 20% Testing
-- **Fitur:** TN, TX, TAVG, RH_AVG, RR, SS, FF_AVG
-- **Label:** Cerah, Berawan, Hujan Ringan, Hujan Lebat
-
----
+- Form manual (`prediction-form`) sudah sesuai schema API terbaru (tanpa `RR` dan `SS`).
+- Komponen otomatis (`hero` dan `current-weather`) memakai helper prediksi bersama dengan:
+  - cache hasil prediksi 1 jam di localStorage
+  - dedup request in-flight agar tidak double hit ke `/prediksi` saat mount bersamaan
 
 ## 👤 Author
 
-**Nama:** [Firman Parulian Siburian]  
-**Program Studi:** [Teknik Informatika]  
-**Tahun:** 2026
-
----
+- **Nama**: Firman Parulian Siburian
+- **Program Studi**: Teknik Informatika
+- **Tahun**: 2026
 
 ## 📄 Lisensi
 
-Project ini dibuat untuk keperluan **Tugas Akhir / Skripsi**.  
-Data bersumber dari BMKG dan digunakan untuk keperluan akademik.
+Project ini dibuat untuk keperluan **Tugas Akhir / Skripsi** dan penggunaan akademik.
