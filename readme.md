@@ -1,7 +1,7 @@
 # 🌤️ Klasifikasi Cuaca Kota Pekanbaru
 ### Klasifikasi Kondisi Cuaca Harian Menggunakan Random Forest
 
-## 📋 Deskripsi Projectsssss
+## 📋 Deskripsi Project
 
 Project ini adalah sistem klasifikasi cuaca Kota Pekanbaru berbasis **Random Forest** dengan arsitektur:
 - **Backend**: Flask API untuk endpoint prediksi model
