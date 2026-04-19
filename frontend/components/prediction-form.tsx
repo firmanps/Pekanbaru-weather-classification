@@ -5,11 +5,10 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axiosInstance from "@/lib/axios";
-import type { FormEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useMemo, useState } from "react";
 
 import {
-  CloudRain,
   Droplets,
   RotateCcw,
   Send,
@@ -23,9 +22,9 @@ type PredictionPayload = {
   TX: number;
   TAVG: number;
   RH_AVG: number;
-  RR: number;
-  SS: number;
   FF_AVG: number;
+  SOLAR: number;
+  SOLAR_CLEAR: number;
 };
 
 type FormState = {
@@ -33,9 +32,9 @@ type FormState = {
   TX: string;
   TAVG: string;
   RH_AVG: string;
-  RR: string;
-  SS: string;
   FF_AVG: string;
+  SOLAR: string;
+  SOLAR_CLEAR: string;
 };
 
 type PredictionResult = {
@@ -49,9 +48,9 @@ const initialState: FormState = {
   TX: "",
   TAVG: "",
   RH_AVG: "",
-  RR: "",
-  SS: "",
   FF_AVG: "",
+  SOLAR: "",
+  SOLAR_CLEAR: "",
 };
 
 export default function PredictionForm() {
@@ -61,9 +60,9 @@ export default function PredictionForm() {
     TX: false,
     TAVG: false,
     RH_AVG: false,
-    RR: false,
-    SS: false,
     FF_AVG: false,
+    SOLAR: false,
+    SOLAR_CLEAR: false,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -93,8 +92,22 @@ export default function PredictionForm() {
 
   const isValid = Object.keys(errors).length === 0;
 
+  const showError = (key: keyof FormState) => touched[key] && errors[key];
+
   function setField<K extends keyof FormState>(key: K, value: string) {
-    setValues((prev) => ({ ...prev, [key]: value }));
+    setValues((prev: FormState) => ({ ...prev, [key]: value }));
+  }
+
+  function onFieldChange<K extends keyof FormState>(key: K) {
+    return (e: ChangeEvent<HTMLInputElement>) => {
+      setField(key, e.target.value);
+      if (!touched[key]) {
+        setTouched((prev: Record<keyof FormState, boolean>) => ({
+          ...prev,
+          [key]: true,
+        }));
+      }
+    };
   }
 
   function onClear() {
@@ -105,9 +118,9 @@ export default function PredictionForm() {
       TX: false,
       TAVG: false,
       RH_AVG: false,
-      RR: false,
-      SS: false,
       FF_AVG: false,
+      SOLAR: false,
+      SOLAR_CLEAR: false,
     });
 
     setApiError(null);
@@ -122,9 +135,9 @@ export default function PredictionForm() {
       TX: true,
       TAVG: true,
       RH_AVG: true,
-      RR: true,
-      SS: true,
       FF_AVG: true,
+      SOLAR: true,
+      SOLAR_CLEAR: true,
     });
 
     setApiError(null);
@@ -137,9 +150,9 @@ export default function PredictionForm() {
       TX: Number(values.TX),
       TAVG: Number(values.TAVG),
       RH_AVG: Number(values.RH_AVG),
-      RR: Number(values.RR),
-      SS: Number(values.SS),
       FF_AVG: Number(values.FF_AVG),
+      SOLAR: Number(values.SOLAR),
+      SOLAR_CLEAR: Number(values.SOLAR_CLEAR),
     };
 
     setIsSubmitting(true);
@@ -153,11 +166,16 @@ export default function PredictionForm() {
         icon: data.icon,
         confidence: data.confidence,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as {
+        response?: { data?: { message?: string; error?: string; pesan?: string } };
+        message?: string;
+      };
       const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.response?.data?.pesan ||
+        error?.message ||
         "Terjadi kesalahan saat memanggil API.";
 
       setApiError(String(msg));
@@ -179,6 +197,9 @@ export default function PredictionForm() {
 
       case "Hujan Lebat":
         return "/weather/heavy-rain.gif";
+
+      case "Hujan":
+        return "/weather/light-rain.gif";
 
       default:
         return "/weather/sunny.gif";
@@ -209,8 +230,11 @@ export default function PredictionForm() {
                 step="any"
                 placeholder="24"
                 value={values.TN}
-                onChange={(e) => setField("TN", e.target.value)}
+                onChange={onFieldChange("TN")}
               />
+              {showError("TN") && (
+                <p className="text-xs text-red-600">{errors.TN}</p>
+              )}
             </div>
 
             {/* TX */}
@@ -224,8 +248,11 @@ export default function PredictionForm() {
                 step="any"
                 placeholder="31.9"
                 value={values.TX}
-                onChange={(e) => setField("TX", e.target.value)}
+                onChange={onFieldChange("TX")}
               />
+              {showError("TX") && (
+                <p className="text-xs text-red-600">{errors.TX}</p>
+              )}
             </div>
 
             {/* TAVG */}
@@ -239,8 +266,11 @@ export default function PredictionForm() {
                 step="any"
                 placeholder="27.6"
                 value={values.TAVG}
-                onChange={(e) => setField("TAVG", e.target.value)}
+                onChange={onFieldChange("TAVG")}
               />
+              {showError("TAVG") && (
+                <p className="text-xs text-red-600">{errors.TAVG}</p>
+              )}
             </div>
 
             {/* RH */}
@@ -254,38 +284,47 @@ export default function PredictionForm() {
                 step="any"
                 placeholder="76"
                 value={values.RH_AVG}
-                onChange={(e) => setField("RH_AVG", e.target.value)}
+                onChange={onFieldChange("RH_AVG")}
               />
+              {showError("RH_AVG") && (
+                <p className="text-xs text-red-600">{errors.RH_AVG}</p>
+              )}
             </div>
 
-            {/* RR */}
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <CloudRain size={16} />
-                RR Rainfall (mm)
-              </Label>
-              <Input
-                type="number"
-                step="any"
-                placeholder="1.3"
-                value={values.RR}
-                onChange={(e) => setField("RR", e.target.value)}
-              />
-            </div>
-
-            {/* SS */}
+            {/* SOLAR */}
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Sun size={16} />
-                SS Sunshine Duration (hrs)
+                SOLAR Surface Solar Radiation (kWh/m2/day)
               </Label>
               <Input
                 type="number"
                 step="any"
-                placeholder="6.7"
-                value={values.SS}
-                onChange={(e) => setField("SS", e.target.value)}
+                placeholder="5.4"
+                value={values.SOLAR}
+                onChange={onFieldChange("SOLAR")}
               />
+              {showError("SOLAR") && (
+                <p className="text-xs text-red-600">{errors.SOLAR}</p>
+              )}
+            </div>
+
+            {/* SOLAR_CLEAR */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Sun size={16} />
+                SOLAR_CLEAR Clear Sky Radiation (kWh/m2/day)
+              </Label>
+              <Input
+                type="number"
+                step="any"
+                placeholder="6.8"
+                value={values.SOLAR_CLEAR}
+                onChange={onFieldChange("SOLAR_CLEAR")}
+              />
+              {showError("SOLAR_CLEAR") && (
+                <p className="text-xs text-red-600">{errors.SOLAR_CLEAR}</p>
+              )}
             </div>
 
             {/* WIND */}
@@ -299,8 +338,11 @@ export default function PredictionForm() {
                 step="any"
                 placeholder="3"
                 value={values.FF_AVG}
-                onChange={(e) => setField("FF_AVG", e.target.value)}
+                onChange={onFieldChange("FF_AVG")}
               />
+              {showError("FF_AVG") && (
+                <p className="text-xs text-red-600">{errors.FF_AVG}</p>
+              )}
             </div>
           </div>
 

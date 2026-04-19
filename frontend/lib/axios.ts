@@ -1,7 +1,11 @@
 import axios from "axios";
 
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_URL?.trim().replace(/\/+$/, "") ||
+  "http://localhost:5002";
+
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
+  baseURL: apiBaseUrl,
   headers: {
     "Content-Type": "application/json",
   },

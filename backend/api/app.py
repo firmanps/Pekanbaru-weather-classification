@@ -130,7 +130,7 @@ def prediksi():
         # ==============================
         # VALIDASI INPUT
         # ==============================
-        required_fields = ['TN', 'TX', 'TAVG', 'RH_AVG', 'SS', 'FF_AVG']
+        required_fields = ['TN', 'TX', 'TAVG', 'RH_AVG', 'FF_AVG', 'SOLAR', 'SOLAR_CLEAR']
 
         missing_fields = []
         for field in required_fields:
@@ -166,14 +166,18 @@ def prediksi():
         TX = float(data['TX'])
         TAVG = float(data['TAVG'])
         RH = float(data['RH_AVG'])
-        SS = float(data['SS'])
         FF = float(data['FF_AVG'])
+        SOLAR = float(data['SOLAR'])
+        SOLAR_CLEAR = float(data['SOLAR_CLEAR'])
 
         # ==============================
         # FEATURE ENGINEERING (WAJIB SAMA)
         # ==============================
         TEMP_RANGE = TX - TN
         TEMP_AVG_HUM = TAVG * RH
+        HUMIDITY_HEAT = RH / TAVG
+        WIND_TEMP = FF * TAVG
+        CLEAR_SKY_RATIO = SOLAR / SOLAR_CLEAR if SOLAR_CLEAR != 0 else 0.0
 
         # ==============================
         # BUAT DATAFRAME SESUAI MODEL
@@ -183,14 +187,19 @@ def prediksi():
             'TX': TX,
             'TAVG': TAVG,
             'RH_AVG': RH,
-            'SS': SS,
             'FF_AVG': FF,
+            'SOLAR': SOLAR,
+            'SOLAR_CLEAR': SOLAR_CLEAR,
             'TEMP_RANGE': TEMP_RANGE,
-            'TEMP_AVG_HUM': TEMP_AVG_HUM
+            'TEMP_AVG_HUM': TEMP_AVG_HUM,
+            'HUMIDITY_HEAT': HUMIDITY_HEAT,
+            'WIND_TEMP': WIND_TEMP,
+            'CLEAR_SKY_RATIO': CLEAR_SKY_RATIO
         }])
 
         # Pastikan urutan sama dengan training
-        df = df[['TN','TX','TAVG','RH_AVG','SS','FF_AVG','TEMP_RANGE','TEMP_AVG_HUM']]
+        df = df[['TN','TX','TAVG','RH_AVG','FF_AVG','SOLAR','SOLAR_CLEAR',
+                 'TEMP_RANGE','TEMP_AVG_HUM','HUMIDITY_HEAT','WIND_TEMP','CLEAR_SKY_RATIO']]
 
         print("📥 Data masuk:")
         print(df)
@@ -206,8 +215,7 @@ def prediksi():
         icon_map = {
             'Cerah':        '☀️',
             'Berawan':      '⛅',
-            'Hujan Ringan': '🌧️',
-            'Hujan Lebat':  '⛈️'
+            'Hujan':        '🌧️'
         }
 
         return jsonify({

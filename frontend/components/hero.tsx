@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import axiosInstance from "@/lib/axios";
+import { getOrFetchPrediction } from "@/lib/prediction";
 import { useWeather } from "@/lib/weather-context";
 import { motion } from "framer-motion";
 import { ArrowRight, Brain, ChartColumn } from "lucide-react";
@@ -28,35 +28,8 @@ export default function Hero() {
 
     const fetchPrediction = async () => {
       try {
-        const forecastRes = await axiosInstance.get(
-          `https://api.openweathermap.org/data/2.5/forecast?q=Pekanbaru&units=metric&appid=${API_KEY}`
-        );
-
-        const list = forecastRes.data.list;
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const tomorrowDate = tomorrow.toISOString().split("T")[0];
-
-        const tomorrowData = list.filter((item: any) =>
-          item.dt_txt.startsWith(tomorrowDate)
-        );
-        if (!tomorrowData.length) return;
-
-        const temps = tomorrowData.map((item: any) => item.main.temp);
-        const TN = Math.min(...temps);
-        const TX = Math.max(...temps);
-
-        const dataset = {
-          TN,
-          TX,
-          TAVG: weather.main.temp,
-          RH_AVG: weather.main.humidity,
-          SS: (100 - weather.clouds.all) / 10,
-          FF_AVG: weather.wind.speed,
-        };
-
-        const prediksiRes = await axiosInstance.post("/prediksi", dataset);
-        setAiPrediction(prediksiRes.data?.cuaca ?? null);
+        const prediction = await getOrFetchPrediction(weather, API_KEY);
+        setAiPrediction(prediction);
       } catch (error) {
         console.error("Gagal fetch prediksi cuaca hero:", error);
       }
@@ -75,6 +48,8 @@ export default function Hero() {
         return "/weather/light-rain.gif";
       case "Hujan Lebat":
         return "/weather/heavy-rain.gif";
+      case "Hujan":
+        return "/weather/light-rain.gif";
       default:
         return "/weather/sunny.gif";
     }
