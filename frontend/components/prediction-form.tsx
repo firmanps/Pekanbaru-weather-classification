@@ -9,6 +9,7 @@ import type { ChangeEvent, FormEvent } from "react";
 import { useMemo, useState } from "react";
 
 import {
+  Cloud,
   Droplets,
   RotateCcw,
   Send,
@@ -18,51 +19,68 @@ import {
 } from "lucide-react";
 
 type PredictionPayload = {
-  TN: number;
-  TX: number;
-  TAVG: number;
-  RH_AVG: number;
-  FF_AVG: number;
-  SOLAR: number;
-  SOLAR_CLEAR: number;
+  T2M_MAX: number;
+  T2M_MIN: number;
+  T2M: number;
+  RH2M: number;
+  WS2M: number;
+  ALLSKY_SFC_SW_DWN: number;
+  CLRSKY_SFC_SW_DWN: number;
+  QV2M: number;
 };
 
 type FormState = {
-  TN: string;
-  TX: string;
-  TAVG: string;
-  RH_AVG: string;
-  FF_AVG: string;
-  SOLAR: string;
-  SOLAR_CLEAR: string;
+  T2M_MAX: string;
+  T2M_MIN: string;
+  T2M: string;
+  RH2M: string;
+  WS2M: string;
+  ALLSKY_SFC_SW_DWN: string;
+  CLRSKY_SFC_SW_DWN: string;
+  QV2M: string;
 };
 
 type PredictionResult = {
   cuaca: string;
   icon: string;
   confidence?: number;
+  probabilitas?: Record<string, number>;
+  cloud_cover?: number;
 };
 
 const initialState: FormState = {
-  TN: "",
-  TX: "",
-  TAVG: "",
-  RH_AVG: "",
-  FF_AVG: "",
-  SOLAR: "",
-  SOLAR_CLEAR: "",
+  T2M_MAX: "",
+  T2M_MIN: "",
+  T2M: "",
+  RH2M: "",
+  WS2M: "",
+  ALLSKY_SFC_SW_DWN: "",
+  CLRSKY_SFC_SW_DWN: "",
+  QV2M: "",
 };
+
+const formFields: (keyof FormState)[] = [
+  "T2M_MAX",
+  "T2M_MIN",
+  "T2M",
+  "RH2M",
+  "WS2M",
+  "ALLSKY_SFC_SW_DWN",
+  "CLRSKY_SFC_SW_DWN",
+  "QV2M",
+];
 
 export default function PredictionForm() {
   const [values, setValues] = useState<FormState>(initialState);
   const [touched, setTouched] = useState<Record<keyof FormState, boolean>>({
-    TN: false,
-    TX: false,
-    TAVG: false,
-    RH_AVG: false,
-    FF_AVG: false,
-    SOLAR: false,
-    SOLAR_CLEAR: false,
+    T2M_MAX: false,
+    T2M_MIN: false,
+    T2M: false,
+    RH2M: false,
+    WS2M: false,
+    ALLSKY_SFC_SW_DWN: false,
+    CLRSKY_SFC_SW_DWN: false,
+    QV2M: false,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,7 +90,7 @@ export default function PredictionForm() {
   const errors = useMemo(() => {
     const next: Partial<Record<keyof FormState, string>> = {};
 
-    (Object.keys(values) as (keyof FormState)[]).forEach((key) => {
+    formFields.forEach((key) => {
       const raw = values[key].trim();
 
       if (raw.length === 0) {
@@ -84,6 +102,11 @@ export default function PredictionForm() {
 
       if (!Number.isFinite(n)) {
         next[key] = "Harus berupa angka";
+        return;
+      }
+
+      if (key === "CLRSKY_SFC_SW_DWN" && n === 0) {
+        next[key] = "Tidak boleh 0";
       }
     });
 
@@ -112,17 +135,16 @@ export default function PredictionForm() {
 
   function onClear() {
     setValues(initialState);
-
     setTouched({
-      TN: false,
-      TX: false,
-      TAVG: false,
-      RH_AVG: false,
-      FF_AVG: false,
-      SOLAR: false,
-      SOLAR_CLEAR: false,
+      T2M_MAX: false,
+      T2M_MIN: false,
+      T2M: false,
+      RH2M: false,
+      WS2M: false,
+      ALLSKY_SFC_SW_DWN: false,
+      CLRSKY_SFC_SW_DWN: false,
+      QV2M: false,
     });
-
     setApiError(null);
     setResult(null);
   }
@@ -131,13 +153,14 @@ export default function PredictionForm() {
     e.preventDefault();
 
     setTouched({
-      TN: true,
-      TX: true,
-      TAVG: true,
-      RH_AVG: true,
-      FF_AVG: true,
-      SOLAR: true,
-      SOLAR_CLEAR: true,
+      T2M_MAX: true,
+      T2M_MIN: true,
+      T2M: true,
+      RH2M: true,
+      WS2M: true,
+      ALLSKY_SFC_SW_DWN: true,
+      CLRSKY_SFC_SW_DWN: true,
+      QV2M: true,
     });
 
     setApiError(null);
@@ -146,13 +169,14 @@ export default function PredictionForm() {
     if (!isValid) return;
 
     const payload: PredictionPayload = {
-      TN: Number(values.TN),
-      TX: Number(values.TX),
-      TAVG: Number(values.TAVG),
-      RH_AVG: Number(values.RH_AVG),
-      FF_AVG: Number(values.FF_AVG),
-      SOLAR: Number(values.SOLAR),
-      SOLAR_CLEAR: Number(values.SOLAR_CLEAR),
+      T2M_MAX: Number(values.T2M_MAX),
+      T2M_MIN: Number(values.T2M_MIN),
+      T2M: Number(values.T2M),
+      RH2M: Number(values.RH2M),
+      WS2M: Number(values.WS2M),
+      ALLSKY_SFC_SW_DWN: Number(values.ALLSKY_SFC_SW_DWN),
+      CLRSKY_SFC_SW_DWN: Number(values.CLRSKY_SFC_SW_DWN),
+      QV2M: Number(values.QV2M),
     };
 
     setIsSubmitting(true);
@@ -161,14 +185,27 @@ export default function PredictionForm() {
       const res = await axiosInstance.post("/prediksi", payload);
       const data = res.data;
 
+      if (data.status !== "success") {
+        setApiError(data.message || data.pesan || "Prediksi gagal.");
+        return;
+      }
+
       setResult({
         cuaca: data.cuaca,
         icon: data.icon,
         confidence: data.confidence,
+        probabilitas: data.probabilitas,
+        cloud_cover: data.cloud_cover,
       });
     } catch (err: unknown) {
       const error = err as {
-        response?: { data?: { message?: string; error?: string; pesan?: string } };
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+            pesan?: string;
+          };
+        };
         message?: string;
       };
       const msg =
@@ -188,19 +225,12 @@ export default function PredictionForm() {
     switch (cuaca) {
       case "Cerah":
         return "/weather/sunny.gif";
-
       case "Berawan":
         return "/weather/cloudy.gif";
-
       case "Hujan Ringan":
         return "/weather/light-rain.gif";
-
       case "Hujan Lebat":
         return "/weather/heavy-rain.gif";
-
-      case "Hujan":
-        return "/weather/light-rain.gif";
-
       default:
         return "/weather/sunny.gif";
     }
@@ -213,135 +243,149 @@ export default function PredictionForm() {
       </h2>
 
       <p className="text-center text-gray-500 mb-8">
-        Enter meteorological parameters to classify weather conditions
+        Masukkan parameter meteorologi NASA POWER untuk klasifikasi cuaca
       </p>
 
       <Card className="p-8 space-y-6">
         <form className="space-y-6" onSubmit={onSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* TN */}
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Thermometer size={16} />
-                TN Min Temperature (°C)
+                T2M_MIN — Suhu Minimum (°C)
               </Label>
               <Input
                 type="number"
                 step="any"
-                placeholder="24"
-                value={values.TN}
-                onChange={onFieldChange("TN")}
+                placeholder="22.98"
+                value={values.T2M_MIN}
+                onChange={onFieldChange("T2M_MIN")}
               />
-              {showError("TN") && (
-                <p className="text-xs text-red-600">{errors.TN}</p>
+              {showError("T2M_MIN") && (
+                <p className="text-xs text-red-600">{errors.T2M_MIN}</p>
               )}
             </div>
 
-            {/* TX */}
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Thermometer size={16} />
-                TX Max Temperature (°C)
+                T2M_MAX — Suhu Maksimum (°C)
               </Label>
               <Input
                 type="number"
                 step="any"
-                placeholder="31.9"
-                value={values.TX}
-                onChange={onFieldChange("TX")}
+                placeholder="27.87"
+                value={values.T2M_MAX}
+                onChange={onFieldChange("T2M_MAX")}
               />
-              {showError("TX") && (
-                <p className="text-xs text-red-600">{errors.TX}</p>
+              {showError("T2M_MAX") && (
+                <p className="text-xs text-red-600">{errors.T2M_MAX}</p>
               )}
             </div>
 
-            {/* TAVG */}
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Thermometer size={16} />
-                TAVG Avg Temperature (°C)
+                T2M — Suhu Rata-rata (°C)
               </Label>
               <Input
                 type="number"
                 step="any"
-                placeholder="27.6"
-                value={values.TAVG}
-                onChange={onFieldChange("TAVG")}
+                placeholder="24.94"
+                value={values.T2M}
+                onChange={onFieldChange("T2M")}
               />
-              {showError("TAVG") && (
-                <p className="text-xs text-red-600">{errors.TAVG}</p>
+              {showError("T2M") && (
+                <p className="text-xs text-red-600">{errors.T2M}</p>
               )}
             </div>
 
-            {/* RH */}
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Droplets size={16} />
-                RH_AVG Avg Humidity (%)
+                RH2M — Kelembapan Relatif (%)
               </Label>
               <Input
                 type="number"
                 step="any"
-                placeholder="76"
-                value={values.RH_AVG}
-                onChange={onFieldChange("RH_AVG")}
+                placeholder="91.61"
+                value={values.RH2M}
+                onChange={onFieldChange("RH2M")}
               />
-              {showError("RH_AVG") && (
-                <p className="text-xs text-red-600">{errors.RH_AVG}</p>
+              {showError("RH2M") && (
+                <p className="text-xs text-red-600">{errors.RH2M}</p>
               )}
             </div>
 
-            {/* SOLAR */}
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Sun size={16} />
-                SOLAR Surface Solar Radiation (kWh/m2/day)
+                ALLSKY_SFC_SW_DWN — Radiasi Matahari (MJ/m²/day)
               </Label>
               <Input
                 type="number"
                 step="any"
-                placeholder="5.4"
-                value={values.SOLAR}
-                onChange={onFieldChange("SOLAR")}
+                placeholder="10.57"
+                value={values.ALLSKY_SFC_SW_DWN}
+                onChange={onFieldChange("ALLSKY_SFC_SW_DWN")}
               />
-              {showError("SOLAR") && (
-                <p className="text-xs text-red-600">{errors.SOLAR}</p>
+              {showError("ALLSKY_SFC_SW_DWN") && (
+                <p className="text-xs text-red-600">
+                  {errors.ALLSKY_SFC_SW_DWN}
+                </p>
               )}
             </div>
 
-            {/* SOLAR_CLEAR */}
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Sun size={16} />
-                SOLAR_CLEAR Clear Sky Radiation (kWh/m2/day)
+                CLRSKY_SFC_SW_DWN — Radiasi Langit Cerah (MJ/m²/day)
               </Label>
               <Input
                 type="number"
                 step="any"
-                placeholder="6.8"
-                value={values.SOLAR_CLEAR}
-                onChange={onFieldChange("SOLAR_CLEAR")}
+                placeholder="23.24"
+                value={values.CLRSKY_SFC_SW_DWN}
+                onChange={onFieldChange("CLRSKY_SFC_SW_DWN")}
               />
-              {showError("SOLAR_CLEAR") && (
-                <p className="text-xs text-red-600">{errors.SOLAR_CLEAR}</p>
+              {showError("CLRSKY_SFC_SW_DWN") && (
+                <p className="text-xs text-red-600">
+                  {errors.CLRSKY_SFC_SW_DWN}
+                </p>
               )}
             </div>
 
-            {/* WIND */}
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Wind size={16} />
-                FF_AVG Avg Wind Speed (m/s)
+                WS2M — Kecepatan Angin (m/s)
               </Label>
               <Input
                 type="number"
                 step="any"
-                placeholder="3"
-                value={values.FF_AVG}
-                onChange={onFieldChange("FF_AVG")}
+                placeholder="0.16"
+                value={values.WS2M}
+                onChange={onFieldChange("WS2M")}
               />
-              {showError("FF_AVG") && (
-                <p className="text-xs text-red-600">{errors.FF_AVG}</p>
+              {showError("WS2M") && (
+                <p className="text-xs text-red-600">{errors.WS2M}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Cloud size={16} />
+                QV2M — Kelembapan Spesifik (g/kg)
+              </Label>
+              <Input
+                type="number"
+                step="any"
+                placeholder="18"
+                value={values.QV2M}
+                onChange={onFieldChange("QV2M")}
+              />
+              {showError("QV2M") && (
+                <p className="text-xs text-red-600">{errors.QV2M}</p>
               )}
             </div>
           </div>
@@ -355,28 +399,26 @@ export default function PredictionForm() {
               className="flex items-center justify-center gap-2 w-full sm:flex-1 bg-blue-600 hover:bg-blue-500 transition duration-300 hover:scale-[1.02]"
             >
               <Send size={18} />
-              {isSubmitting ? "Classifying..." : "Classify Weather"}
+              {isSubmitting ? "Memproses..." : "Klasifikasi Cuaca"}
             </Button>
 
             <Button
               type="button"
               variant="outline"
               onClick={onClear}
-              className="flex items-center justify-center gap-2 w-full sm:w-[140px] transition duration-300 hover:bg-gray-100 hover:scale-[1.02]"
+              className="flex items-center justify-center gap-2 w-full sm:w-35 transition duration-300 hover:bg-gray-100 hover:scale-[1.02]"
             >
               <RotateCcw size={18} />
-              Clear
+              Reset
             </Button>
           </div>
         </form>
       </Card>
 
-      {/* RESULT */}
-
       {result && (
         <Card className="mt-8 p-10 text-center bg-[#e8dfd2] border-none animate-in fade-in slide-in-from-bottom-6 duration-700 hover:scale-[1.02] transition-transform">
           <p className="text-sm tracking-widest text-gray-500">
-            CLASSIFICATION RESULT
+            HASIL KLASIFIKASI
           </p>
 
           <div className="flex justify-center my-6">
@@ -384,27 +426,42 @@ export default function PredictionForm() {
               <img
                 src={getWeatherGif(result.cuaca)}
                 alt={result.cuaca}
-                className="
-                w-24 h-24
-                object-contain
-                transition
-                duration-300
-                hover:scale-110"
+                className="w-24 h-24 object-contain transition duration-300 hover:scale-110"
               />
             </div>
           </div>
 
-          <p className="text-gray-500">Weather</p>
-
+          <p className="text-5xl mb-2">{result.icon}</p>
+          <p className="text-gray-500">Cuaca</p>
           <h2 className="text-4xl font-bold">{result.cuaca}</h2>
 
-          {result.confidence && (
+          {result.confidence != null && (
             <>
               <p className="text-gray-500 mt-4">Confidence</p>
               <p className="text-blue-600 text-2xl font-semibold">
-                {Math.round(result.confidence * 100)}%
+                {Math.round(result.confidence)}%
               </p>
             </>
+          )}
+
+          {result.cloud_cover != null && (
+            <p className="text-sm text-gray-600 mt-2">
+              Cloud Cover: {(result.cloud_cover * 100).toFixed(1)}%
+            </p>
+          )}
+
+          {result.probabilitas && (
+            <div className="mt-6 grid grid-cols-2 gap-2 text-sm text-left max-w-sm mx-auto">
+              {Object.entries(result.probabilitas).map(([label, value]) => (
+                <div
+                  key={label}
+                  className="flex justify-between bg-white/60 rounded px-3 py-2"
+                >
+                  <span>{label}</span>
+                  <span className="font-medium">{value}%</span>
+                </div>
+              ))}
+            </div>
           )}
         </Card>
       )}

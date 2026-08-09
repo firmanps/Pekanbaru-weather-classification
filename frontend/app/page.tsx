@@ -4,6 +4,7 @@ import Hero from "@/components/hero";
 import Reveal from "@/components/motion/reveal";
 import Navbar from "@/components/navbar";
 import PredictionForm from "@/components/prediction-form";
+import WeatherMap from "@/components/ui/weather-map";
 
 export default function Home() {
   return (
@@ -15,12 +16,12 @@ export default function Home() {
       </Reveal>
 
       <Reveal delay={0.05}>
-        <CurrentWeather />
+        <WeatherMap />
       </Reveal>
 
-      {/* <Reveal delay={0.05}>
-        <Forecast />
-      </Reveal> */}
+      <Reveal delay={0.05}>
+        <CurrentWeather />
+      </Reveal>
 
       <Reveal delay={0.05}>
         <PredictionForm />

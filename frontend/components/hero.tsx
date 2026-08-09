@@ -1,20 +1,20 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { getOrFetchPrediction } from "@/lib/prediction";
-import { useWeather } from "@/lib/weather-context";
 import { motion } from "framer-motion";
-import { ArrowRight, Brain, ChartColumn } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  ArrowRight,
+  Brain,
+  ChartColumn,
+  CloudRain,
+  Droplets,
+  Wind,
+} from "lucide-react";
 
 export default function Hero() {
-  const weather = useWeather();
-  const [aiPrediction, setAiPrediction] = useState<string | null>(null);
-  const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
-
-  // Fungsi scroll universal - Paling reliable
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
+
     if (element) {
       element.scrollIntoView({
         behavior: "smooth",
@@ -23,158 +23,204 @@ export default function Hero() {
     }
   };
 
-  useEffect(() => {
-    if (!weather) return;
-
-    const fetchPrediction = async () => {
-      try {
-        const prediction = await getOrFetchPrediction(weather, API_KEY);
-        setAiPrediction(prediction);
-      } catch (error) {
-        console.error("Gagal fetch prediksi cuaca hero:", error);
-      }
-    };
-
-    fetchPrediction();
-  }, [weather, API_KEY]);
-
-  function getWeatherGif(cuaca: string | null) {
-    switch (cuaca) {
-      case "Cerah":
-        return "/weather/sunny.gif";
-      case "Berawan":
-        return "/weather/cloudy.gif";
-      case "Hujan Ringan":
-        return "/weather/light-rain.gif";
-      case "Hujan Lebat":
-        return "/weather/heavy-rain.gif";
-      case "Hujan":
-        return "/weather/light-rain.gif";
-      default:
-        return "/weather/sunny.gif";
-    }
-  }
-
   return (
     <section
       id="home"
-      className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 py-16 items-center mt-10 px-4"
+      className="relative min-h-[calc(100vh-80px)] overflow-hidden bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: "url('/img/background.png')",
+      }}
     >
-      {/* LEFT CONTENT */}
-      <motion.div
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.35 }}
-        variants={{
-          hidden: {},
-          show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
-        }}
-      >
+      {/* Dark gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-900/45 to-transparent" />
+
+      {/* Additional soft overlay */}
+      <div className="absolute inset-0 bg-black/10" />
+
+      {/* Decorative blur */}
+      <div className="absolute -left-32 top-20 h-72 w-72 rounded-full bg-blue-400/10 blur-3xl" />
+      <div className="absolute right-0 bottom-0 h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" />
+
+      {/* Main content */}
+      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-80px)] max-w-7xl items-center px-6 py-20 lg:px-8">
         <motion.div
+          initial="hidden"
+          animate="show"
           variants={{
-            hidden: { opacity: 0, y: 10, filter: "blur(6px)" },
-            show: { opacity: 1, y: 0, filter: "blur(0px)" },
+            hidden: {},
+            show: {
+              transition: {
+                staggerChildren: 0.12,
+              },
+            },
           }}
-          className="inline-flex items-center gap-2 bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-medium transition hover:scale-105"
+          className="max-w-3xl"
         >
-          <Brain size={16} />
-          Weather Classification System
-        </motion.div>
-
-        <motion.h1
-          variants={{
-            hidden: { opacity: 0, y: 14, filter: "blur(6px)" },
-            show: { opacity: 1, y: 0, filter: "blur(0px)" },
-          }}
-          className="text-4xl md:text-5xl font-bold mt-4 leading-tight"
-        >
-          Weather Classification <br />
-          System for <span className="text-blue-600">Pekanbaru</span>
-        </motion.h1>
-
-        <motion.p
-          variants={{
-            hidden: { opacity: 0, y: 14 },
-            show: { opacity: 1, y: 0 },
-          }}
-          className="text-gray-500 mt-4 max-w-xl"
-        >
-          This application classifies daily weather conditions using a machine
-          learning model based on meteorological parameters such as temperature,
-          humidity, rainfall, sunshine duration, and wind speed.
-        </motion.p>
-
-        <motion.div
-          variants={{
-            hidden: { opacity: 0, y: 14 },
-            show: { opacity: 1, y: 0 },
-          }}
-          className="flex flex-wrap gap-4 mt-6"
-        >
-          {/* BUTTON 1: CLASSIFICATION */}
-          <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }}>
-            <Button
-              onClick={() => scrollToSection("#prediction")}
-              className="bg-blue-600 hover:bg-blue-500 flex items-center gap-2 transition-all hover:shadow-lg"
-            >
-              Classify Weather
-              <ArrowRight size={18} />
-            </Button>
-          </motion.div>
-
-          {/* BUTTON 2: FORECAST */}
-          <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }}>
-            <Button
-              variant="outline"
-              onClick={() => scrollToSection("#forecast")}
-              className="flex items-center gap-2 transition-all hover:shadow-md"
-            >
-              <ChartColumn size={18} />
-              View Forecast
-            </Button>
-          </motion.div>
-        </motion.div>
-      </motion.div>
-
-      {/* RIGHT WEATHER ICON */}
-      <div className="hidden md:flex justify-center">
-        <motion.div
-          className="relative w-64 h-64 md:w-80 md:h-80 group"
-          initial={{ opacity: 0, scale: 0.96, y: 10 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ type: "spring", stiffness: 120, damping: 16 }}
-        >
-          {/* MAIN CIRCLE */}
+          {/* Badge */}
           <motion.div
-            className="w-full h-full bg-linear-to-br from-[#D2E3F2] to-[#F0E8D8] rounded-full flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-105"
-            whileHover={{ rotate: 1.2 }}
-            transition={{ type: "spring", stiffness: 200, damping: 18 }}
+            variants={{
+              hidden: {
+                opacity: 0,
+                y: 20,
+                filter: "blur(6px)",
+              },
+              show: {
+                opacity: 1,
+                y: 0,
+                filter: "blur(0px)",
+              },
+            }}
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-md"
           >
-            <motion.img
-              src={getWeatherGif(aiPrediction)}
-              alt="weather icon"
-              className="w-52 h-52 object-contain animate-float-weather rounded-full"
-              whileHover={{ scale: 1.04 }}
-              transition={{ type: "spring", stiffness: 240, damping: 16 }}
-            />
+            <Brain size={17} className="text-cyan-300" />
+            Weather Classification System
           </motion.div>
 
-          {/* TEMPERATURE */}
-          {/* {temp && (
-            <div className="absolute top-3 right-0 bg-yellow-100 text-yellow-600 font-semibold px-4 py-2 rounded-full shadow text-sm">
-              {Math.round(temp)}°
-            </div>
-          )} */}
+          {/* Heading */}
+          <motion.h1
+            variants={{
+              hidden: {
+                opacity: 0,
+                y: 25,
+                filter: "blur(6px)",
+              },
+              show: {
+                opacity: 1,
+                y: 0,
+                filter: "blur(0px)",
+              },
+            }}
+            className="text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl"
+          >
+            Weather Classification
+            <br />
+            System for{" "}
+            <span className="bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">
+              Pekanbaru
+            </span>
+          </motion.h1>
 
-          {/* HUMIDITY */}
-          {/* {humidity && (
-            <div className="absolute bottom-4 -left-2 bg-blue-100 text-blue-600 text-sm px-4 py-2 rounded-full shadow">
-              {humidity}% RH
+          {/* Description */}
+          <motion.p
+            variants={{
+              hidden: {
+                opacity: 0,
+                y: 20,
+              },
+              show: {
+                opacity: 1,
+                y: 0,
+              },
+            }}
+            className="mt-6 max-w-2xl text-base leading-7 text-slate-200 sm:text-lg"
+          >
+            This application classifies daily weather conditions using a
+            machine learning model based on meteorological parameters such as
+            temperature, humidity, rainfall, sunshine duration, and wind speed.
+          </motion.p>
+
+          {/* Buttons */}
+          <motion.div
+            variants={{
+              hidden: {
+                opacity: 0,
+                y: 20,
+              },
+              show: {
+                opacity: 1,
+                y: 0,
+              },
+            }}
+            className="mt-8 flex flex-wrap gap-4"
+          >
+            {/* Primary Button */}
+            <motion.div
+              whileHover={{ y: -3, scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <Button
+                onClick={() => scrollToSection("#prediction")}
+                className="h-12 rounded-xl bg-blue-600 px-6 text-sm font-semibold text-white shadow-xl shadow-blue-900/30 transition-all hover:bg-blue-500 hover:shadow-blue-500/30"
+              >
+                Classify Weather
+                <ArrowRight
+                  size={18}
+                  className="ml-2 transition-transform group-hover:translate-x-1"
+                />
+              </Button>
+            </motion.div>
+
+            {/* Secondary Button */}
+            <motion.div
+              whileHover={{ y: -3, scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <Button
+                variant="outline"
+                onClick={() => scrollToSection("#petacuaca")}
+                className="h-12 rounded-xl border-white/40 bg-white/10 px-6 text-sm font-semibold text-white backdrop-blur-md transition-all hover:bg-white/20 hover:text-white"
+              >
+                <ChartColumn size={18} className="mr-2" />
+                View Map
+              </Button>
+            </motion.div>
+          </motion.div>
+
+          {/* Feature cards */}
+          <motion.div
+            variants={{
+              hidden: {
+                opacity: 0,
+                y: 25,
+              },
+              show: {
+                opacity: 1,
+                y: 0,
+              },
+            }}
+            className="mt-10 flex flex-wrap gap-3"
+          >
+            {/* Temperature */}
+            <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-black/20 px-4 py-3 text-white backdrop-blur-md">
+              <div className="rounded-lg bg-orange-400/20 p-2">
+                <CloudRain size={17} className="text-orange-300" />
+              </div>
+
+              <div>
+                <p className="text-xs text-slate-300">Weather</p>
+                <p className="text-sm font-semibold">Daily Analysis</p>
+              </div>
             </div>
-          )} */}
+
+            {/* Humidity */}
+            <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-black/20 px-4 py-3 text-white backdrop-blur-md">
+              <div className="rounded-lg bg-cyan-400/20 p-2">
+                <Droplets size={17} className="text-cyan-300" />
+              </div>
+
+              <div>
+                <p className="text-xs text-slate-300">Data</p>
+                <p className="text-sm font-semibold">Meteorological</p>
+              </div>
+            </div>
+
+            {/* Wind */}
+            <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-black/20 px-4 py-3 text-white backdrop-blur-md">
+              <div className="rounded-lg bg-blue-400/20 p-2">
+                <Wind size={17} className="text-blue-300" />
+              </div>
+
+              <div>
+                <p className="text-xs text-slate-300">Model</p>
+                <p className="text-sm font-semibold">Machine Learning</p>
+              </div>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
+
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/30 to-transparent" />
     </section>
   );
 }

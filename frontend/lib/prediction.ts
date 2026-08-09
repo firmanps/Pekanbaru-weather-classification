@@ -4,7 +4,7 @@ import axiosInstance from "@/lib/axios";
 
 const PREDICTION_CACHE_KEY = "weatherPrediction";
 const ONE_HOUR_MS = 60 * 60 * 1000;
-const DEFAULT_SOLAR_CLEAR = 6.5;
+const DEFAULT_CLRsky_SW = 23.0;
 
 let inFlightPrediction: Promise<string | null> | null = null;
 
@@ -19,6 +19,12 @@ type ForecastItem = {
   wind: { speed: number };
   clouds: { all: number };
 };
+
+function estimateQv2m(tempC: number, rhPercent: number): number {
+  const es = 6.112 * Math.exp((17.67 * tempC) / (tempC + 243.5));
+  const e = (rhPercent / 100) * es;
+  return (622 * e) / (1013.25 - e);
+}
 
 export async function getOrFetchPrediction(
   weather: WeatherLike,
@@ -50,33 +56,36 @@ export async function getOrFetchPrediction(
 
       const temps = tomorrowData.map((item) => item.main.temp);
       const humidities = tomorrowData.map((item) => item.main.humidity);
-      const winds = tomorrowData.map((item) => item.wind.speed);
+      const winds = tomorrowData.map((item) => item.main.wind.speed);
       const clouds = tomorrowData.map((item) => item.clouds.all);
 
-      const TN = Math.min(...temps);
-      const TX = Math.max(...temps);
-      const TAVG =
+      const t2mMin = Math.min(...temps);
+      const t2mMax = Math.max(...temps);
+      const t2m =
         temps.reduce((sum, value) => sum + value, 0) / Math.max(temps.length, 1);
-      const RH_AVG =
+      const rh2m =
         humidities.reduce((sum, value) => sum + value, 0) /
         Math.max(humidities.length, 1);
-      const FF_AVG =
+      const ws2m =
         winds.reduce((sum, value) => sum + value, 0) / Math.max(winds.length, 1);
 
       const cloudAvg =
-        clouds.reduce((sum, value) => sum + value, 0) / Math.max(clouds.length, 1);
+        clouds.reduce((sum, value) => sum + value, 0) /
+        Math.max(clouds.length, 1);
       const clearSkyRatio = Math.max(0.05, (100 - cloudAvg) / 100);
-      const SOLAR_CLEAR = DEFAULT_SOLAR_CLEAR;
-      const SOLAR = SOLAR_CLEAR * clearSkyRatio;
+      const clrskySw = DEFAULT_CLRsky_SW;
+      const allskySw = clrskySw * clearSkyRatio;
+      const qv2m = estimateQv2m(t2m, rh2m);
 
       const payload = {
-        TN,
-        TX,
-        TAVG,
-        RH_AVG,
-        FF_AVG,
-        SOLAR,
-        SOLAR_CLEAR,
+        T2M_MAX: t2mMax,
+        T2M_MIN: t2mMin,
+        T2M: t2m,
+        RH2M: rh2m,
+        WS2M: ws2m,
+        ALLSKY_SFC_SW_DWN: allskySw,
+        CLRSKY_SFC_SW_DWN: clrskySw,
+        QV2M: qv2m,
       };
 
       const prediksiRes = await axiosInstance.post("/prediksi", payload);
@@ -101,7 +110,10 @@ function readPredictionCache(): string | null {
   if (!raw) return null;
 
   try {
-    const parsed = JSON.parse(raw) as { timestamp?: number; cuaca?: string | null };
+    const parsed = JSON.parse(raw) as {
+      timestamp?: number;
+      cuaca?: string | null;
+    };
     if (!parsed.timestamp) return null;
     if (Date.now() - parsed.timestamp >= ONE_HOUR_MS) return null;
     return parsed.cuaca ?? null;
@@ -117,4 +129,3 @@ function writePredictionCache(cuaca: string | null) {
     JSON.stringify({ timestamp: Date.now(), cuaca })
   );
 }
-
